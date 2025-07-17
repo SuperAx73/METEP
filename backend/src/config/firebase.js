@@ -35,7 +35,9 @@ if (!config.firebase.projectId || !config.firebase.privateKey || !config.firebas
 } else {
   const serviceAccount = {
     projectId: config.firebase.projectId,
-    privateKey: config.firebase.privateKey?.replace(/\\n/g, '\n'),
+    privateKey: process.env.FIREBASE_PRIVATE_KEY?.startsWith('"')
+      ? JSON.parse(process.env.FIREBASE_PRIVATE_KEY)
+      : config.firebase.privateKey?.replace(/\\n/g, '\n'),
     clientEmail: config.firebase.clientEmail
   };
 
