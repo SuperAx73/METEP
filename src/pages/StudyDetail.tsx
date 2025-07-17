@@ -1,0 +1,328 @@
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { Study, Record } from '../types';
+import { apiService } from '../services/api';
+import { ArrowLeft, Download, Trash2, Settings } from 'lucide-react';
+import Stopwatch from '../components/Stopwatch/Stopwatch';
+import RecordsTable from '../components/Study/RecordsTable';
+import Button from '../components/UI/Button';
+import Card from '../components/UI/Card';
+import LoadingSpinner from '../components/UI/LoadingSpinner';
+import Input from '../components/UI/Input';
+import toast from 'react-hot-toast';
+
+const StudyDetail: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  
+  const [study, setStudy] = useState<Study | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<'capture' | 'data'>('capture');
+  const [recordForm, setRecordForm] = useState({
+    categoriaCausa: '',
+    comentario: ''
+  });
+
+  useEffect(() => {
+    if (id) {
+      fetchStudy();
+    }
+  }, [id]);
+
+  const fetchStudy = async () => {
+    try {
+      setLoading(true);
+      const data = await apiService.getStudy(id!);
+      setStudy(data);
+    } catch (error) {
+      toast.error('Error al cargar el estudio');
+      navigate('/studies');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRecordTime = async (time: number) => {
+    if (!study) return;
+
+    try {
+      const now = new Date();
+      const recordData = {
+        tiempoCiclo: time,
+        desviacion: time - study.taktime,
+        esMicroparo: time > (study.taktime + study.tolerancia),
+        fecha: now.toLocaleDateString(),
+        hora: now.toLocaleTimeString(),
+        categoriaCausa: recordForm.categoriaCausa,
+        comentario: recordForm.comentario
+      };
+
+      await apiService.addRecord(study.id, recordData);
+      await fetchStudy(); // Refresh study data
+      
+      // Clear form
+      setRecordForm({ categoriaCausa: '', comentario: '' });
+      
+      toast.success('Registro agregado exitosamente');
+    } catch (error) {
+      toast.error('Error al agregar el registro');
+    }
+  };
+
+  const handleClearRecords = async () => {
+    if (!study) return;
+    
+    if (!window.confirm('¿Estás seguro de que quieres eliminar todos los registros?')) {
+      return;
+    }
+
+    try {
+      await apiService.clearRecords(study.id);
+      await fetchStudy();
+      toast.success('Registros eliminados exitosamente');
+    } catch (error) {
+      toast.error('Error al eliminar los registros');
+    }
+  };
+
+  const handleExport = async () => {
+    if (!study) return;
+
+    try {
+      const blob = await apiService.exportToExcel(study.id);
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `estudio_${study.modelo}_${study.familia}.xlsx`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+      toast.success('Archivo exportado exitosamente');
+    } catch (error) {
+      toast.error('Error al exportar el archivo');
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <LoadingSpinner size="lg" />
+      </div>
+    );
+  }
+
+  if (!study) {
+    return (
+      <div className="text-center py-12">
+        <div className="text-gray-500 text-lg mb-4">Estudio no encontrado</div>
+        <Button onClick={() => navigate('/studies')}>
+          Volver a Estudios
+        </Button>
+      </div>
+    );
+  }
+
+  const analytics = {
+    totalRecords: study.records.length,
+    totalMicroparos: study.records.filter(r => r.esMicroparo).length,
+    tiempoTotalPerdido: study.records.filter(r => r.esMicroparo).reduce((sum, r) => sum + r.desviacion, 0),
+    eficiencia: study.records.length > 0 ? 
+      (study.taktime * study.records.length) / study.records.reduce((sum, r) => sum + r.tiempoCiclo, 0) * 100 : 0
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-4">
+          <Button
+            variant="outline"
+            onClick={() => navigate('/studies')}
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Volver
+          </Button>
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">
+              {study.modelo} - {study.familia}
+            </h1>
+            <p className="text-gray-600">Línea: {study.linea}</p>
+          </div>
+        </div>
+        
+        <div className="flex items-center space-x-2">
+          <Button
+            variant="outline"
+            onClick={handleExport}
+          >
+            <Download className="h-4 w-4 mr-2" />
+            Exportar
+          </Button>
+          <Button
+            variant="danger"
+            onClick={handleClearRecords}
+          >
+            <Trash2 className="h-4 w-4 mr-2" />
+            Limpiar
+          </Button>
+        </div>
+      </div>
+
+      {/* Analytics Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <Card>
+          <div className="text-center">
+            <div className="text-3xl font-bold text-blue-600">{analytics.totalRecords}</div>
+            <div className="text-sm text-gray-500">Registros Totales</div>
+          </div>
+        </Card>
+        <Card>
+          <div className="text-center">
+            <div className="text-3xl font-bold text-red-600">{analytics.totalMicroparos}</div>
+            <div className="text-sm text-gray-500">Microparos</div>
+          </div>
+        </Card>
+        <Card>
+          <div className="text-center">
+            <div className="text-3xl font-bold text-orange-600">{analytics.tiempoTotalPerdido.toFixed(1)}s</div>
+            <div className="text-sm text-gray-500">Tiempo Perdido</div>
+          </div>
+        </Card>
+        <Card>
+          <div className="text-center">
+            <div className="text-3xl font-bold text-green-600">{analytics.eficiencia.toFixed(1)}%</div>
+            <div className="text-sm text-gray-500">Eficiencia</div>
+          </div>
+        </Card>
+      </div>
+
+      {/* Tabs */}
+      <div className="border-b border-gray-200">
+        <nav className="-mb-px flex space-x-8">
+          <button
+            onClick={() => setActiveTab('capture')}
+            className={`py-2 px-1 border-b-2 font-medium text-sm ${
+              activeTab === 'capture'
+                ? 'border-blue-500 text-blue-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            }`}
+          >
+            Captura de Tiempos
+          </button>
+          <button
+            onClick={() => setActiveTab('data')}
+            className={`py-2 px-1 border-b-2 font-medium text-sm ${
+              activeTab === 'data'
+                ? 'border-blue-500 text-blue-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            }`}
+          >
+            Datos del Estudio
+          </button>
+        </nav>
+      </div>
+
+      {/* Tab Content */}
+      {activeTab === 'capture' && (
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div>
+              <Stopwatch onRecordTime={handleRecordTime} />
+            </div>
+            
+            <Card title="Información del Registro">
+              <div className="space-y-4">
+                <Input
+                  label="Categoría de Causa"
+                  value={recordForm.categoriaCausa}
+                  onChange={(e) => setRecordForm(prev => ({ ...prev, categoriaCausa: e.target.value }))}
+                  placeholder="Ej: Falta de material, Ajuste de máquina..."
+                />
+                <Input
+                  label="Comentario"
+                  value={recordForm.comentario}
+                  onChange={(e) => setRecordForm(prev => ({ ...prev, comentario: e.target.value }))}
+                  placeholder="Comentario adicional..."
+                />
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <span className="font-medium">Taktime:</span> {study.taktime}s
+                    </div>
+                    <div>
+                      <span className="font-medium">Tolerancia:</span> {study.tolerancia}s
+                    </div>
+                    <div>
+                      <span className="font-medium">Umbral Microparo:</span> {study.taktime + study.tolerancia}s
+                    </div>
+                    <div>
+                      <span className="font-medium">Siguiente Muestra:</span> #{study.records.length + 1}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </Card>
+          </div>
+          
+          <RecordsTable records={study.records} />
+        </div>
+      )}
+
+      {activeTab === 'data' && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Card title="Información del Estudio">
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Responsable</label>
+                <p className="text-sm text-gray-900">{study.responsable}</p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Supervisor</label>
+                <p className="text-sm text-gray-900">{study.supervisor}</p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Línea</label>
+                <p className="text-sm text-gray-900">{study.linea}</p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Modelo</label>
+                <p className="text-sm text-gray-900">{study.modelo}</p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Familia</label>
+                <p className="text-sm text-gray-900">{study.familia}</p>
+              </div>
+            </div>
+          </Card>
+          
+          <Card title="Parámetros de Producción">
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Piezas por Hora</label>
+                <p className="text-sm text-gray-900">{study.piezasPorHora}</p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Taktime (segundos)</label>
+                <p className="text-sm text-gray-900">{study.taktime}</p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Tolerancia (segundos)</label>
+                <p className="text-sm text-gray-900">{study.tolerancia}</p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Fecha de Creación</label>
+                <p className="text-sm text-gray-900">{new Date(study.createdAt).toLocaleDateString()}</p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Última Actualización</label>
+                <p className="text-sm text-gray-900">{new Date(study.updatedAt).toLocaleDateString()}</p>
+              </div>
+            </div>
+          </Card>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default StudyDetail;

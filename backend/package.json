@@ -1,0 +1,30 @@
+{
+  "name": "metep-backend",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Backend for METEP Industrial Microparos Analysis",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "helmet": "^7.1.0",
+    "express-rate-limit": "^7.1.5",
+    "joi": "^17.11.0",
+    "jsonwebtoken": "^9.0.2",
+    "firebase-admin": "^12.0.0",
+    "exceljs": "^4.4.0",
+    "uuid": "^9.0.1",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  },
+  "keywords": ["industrial", "microparos", "analysis", "express", "firebase"],
+  "author": "METEP Team",
+  "license": "MIT"
+}
