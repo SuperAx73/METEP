@@ -14,8 +14,13 @@ export class Study {
     this.piezasPorHora = data.piezasPorHora;
     this.taktime = data.taktime;
     this.tolerancia = data.tolerancia;
-    this.createdAt = data.createdAt || new Date();
-    this.updatedAt = data.updatedAt || new Date();
+    // Conversión robusta de fechas:
+    this.createdAt = data.createdAt && typeof data.createdAt.toDate === 'function'
+      ? data.createdAt.toDate()
+      : new Date(data.createdAt || Date.now());
+    this.updatedAt = data.updatedAt && typeof data.updatedAt.toDate === 'function'
+      ? data.updatedAt.toDate()
+      : new Date(data.updatedAt || Date.now());
     this.records = data.records || [];
   }
 
