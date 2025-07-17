@@ -85,8 +85,16 @@ const StudyDetail: React.FC = () => {
         numeroMuestra: study.records.length + 1
       };
 
-      await addRecord(study.id, recordData);
-      await fetchStudy(); // Refresh study data
+      const newRecord = await addRecord(study.id, recordData);
+      
+      // Update study state locally without refetching
+      setStudy(prevStudy => {
+        if (!prevStudy) return prevStudy;
+        return {
+          ...prevStudy,
+          records: [...prevStudy.records, newRecord]
+        };
+      });
       
       // Clear form
       setRecordForm({ categoriaCausa: '', comentario: '' });
@@ -109,7 +117,16 @@ const StudyDetail: React.FC = () => {
       for (const record of study.records) {
         await deleteRecord(study.id, record.id);
       }
-      await fetchStudy();
+      
+      // Update study state locally without refetching
+      setStudy(prevStudy => {
+        if (!prevStudy) return prevStudy;
+        return {
+          ...prevStudy,
+          records: []
+        };
+      });
+      
       toast.success('Registros eliminados exitosamente');
     } catch (error) {
       toast.error('Error al eliminar los registros');
@@ -141,7 +158,16 @@ const StudyDetail: React.FC = () => {
     try {
       setEditLoading(true);
       const updatedStudy = await updateStudy(study.id, studyData);
-      setStudy(updatedStudy);
+      
+      // Update study state locally without refetching
+      setStudy(prevStudy => {
+        if (!prevStudy) return prevStudy;
+        return {
+          ...updatedStudy,
+          records: prevStudy.records // Keep existing records
+        };
+      });
+      
       setIsEditing(false);
       toast.success('Estudio actualizado exitosamente');
     } catch (error) {
