@@ -1,43 +1,55 @@
 import express from 'express';
 import cors from 'cors';
-import helmet from 'helmet';
-import { config } from '../backend/src/config/environment.js';
-import { apiLimiter } from '../backend/src/middleware/rateLimiter.js';
-import { sanitizeInput } from '../backend/src/middleware/validation.js';
-import routes from '../backend/src/routes/index.js';
-import Logger from '../backend/src/utils/logger.js';
 
 const app = express();
 
-// Security middleware
-app.use(helmet());
+// CORS configuration
 app.use(cors({
-  origin: config.cors.origin,
+  origin: '*',
   credentials: true
 }));
-
-// Rate limiting
-app.use('/api/', apiLimiter);
 
 // Body parsing
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Input sanitization
-app.use(sanitizeInput);
-
-// Routes
-app.use('/api', routes);
-
-// Error handling
-app.use((err, req, res, next) => {
-  Logger.error('Unhandled error:', err);
-  res.status(500).json({ error: 'Error interno del servidor' });
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.json({ 
+    status: 'OK', 
+    timestamp: new Date().toISOString(),
+    message: 'Backend serverless funcionando correctamente' 
+  });
 });
 
-// 404 handler
+// Mock studies endpoint for testing
+app.get('/api/studies', (req, res) => {
+  res.json([
+    {
+      id: 'mock-1',
+      responsable: 'Test User',
+      supervisor: 'Test Supervisor',
+      linea: 'Línea 1',
+      modelo: 'Modelo Test',
+      familia: 'Familia Test',
+      piezasPorHora: 60,
+      taktime: 60,
+      tolerancia: 5,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      records: []
+    }
+  ]);
+});
+
+// Catch all other routes
 app.use('*', (req, res) => {
-  res.status(404).json({ error: 'Ruta no encontrada' });
+  res.status(404).json({ 
+    error: 'Ruta no encontrada',
+    method: req.method,
+    url: req.url,
+    timestamp: new Date().toISOString()
+  });
 });
 
 // Export for Vercel
