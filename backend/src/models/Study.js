@@ -14,6 +14,7 @@ export class Study {
     this.piezasPorHora = data.piezasPorHora;
     this.taktime = data.taktime;
     this.tolerancia = data.tolerancia;
+    this.categories = data.categories || [];
     // Conversión robusta de fechas:
     this.createdAt = data.createdAt && typeof data.createdAt.toDate === 'function'
       ? data.createdAt.toDate()
@@ -26,6 +27,8 @@ export class Study {
 
   async save() {
     try {
+      Logger.info('Saving study with data:', JSON.stringify(this));
+      
       const studyRef = db.collection('studies').doc(this.id);
       const studyData = {
         ...this,
@@ -33,11 +36,14 @@ export class Study {
         updatedAt: new Date()
       };
       
+      Logger.info('Study data to save:', JSON.stringify(studyData));
+      
       await studyRef.set(studyData);
-      Logger.info(`Study saved: ${this.id}`);
+      Logger.info(`Study saved successfully: ${this.id}`);
       return this;
     } catch (error) {
       Logger.error('Error saving study:', error);
+      Logger.error('Error stack:', error.stack);
       throw new Error('Error al guardar el estudio');
     }
   }

@@ -5,10 +5,14 @@ import Logger from '../utils/logger.js';
 export const studyController = {
   async createStudy(req, res) {
     try {
+      Logger.info('Received study data:', JSON.stringify(req.body));
+      
       const studyData = {
         ...req.body,
         userId: req.user.uid
       };
+
+      Logger.info('Processed study data:', JSON.stringify(studyData));
 
       const study = new Study(studyData);
       await study.save();
@@ -51,22 +55,36 @@ export const studyController = {
 
   async updateStudy(req, res) {
     try {
+      Logger.info('Received update data:', JSON.stringify(req.body));
+      Logger.info('Study ID:', req.params.id);
+      Logger.info('User ID:', req.user.uid);
+      
       const study = await Study.findById(req.params.id);
       if (!study) {
+        Logger.warn('Study not found:', req.params.id);
         return res.status(404).json({ error: 'Estudio no encontrado' });
       }
 
+      Logger.info('Study found:', study.id);
+      Logger.info('Study owner:', study.userId);
+
       if (study.userId !== req.user.uid) {
+        Logger.warn('Unauthorized access attempt:', req.user.uid, 'trying to access study:', study.id);
         return res.status(403).json({ error: 'No autorizado' });
       }
 
+      Logger.info('Study found, updating with data:', JSON.stringify(req.body));
+      
       Object.assign(study, req.body);
+      Logger.info('Study object after update:', JSON.stringify(study));
+      
       await study.save();
 
-      Logger.info(`Study updated: ${study.id}`);
+      Logger.info(`Study updated successfully: ${study.id}`);
       res.json(study);
     } catch (error) {
       Logger.error('Error updating study:', error);
+      Logger.error('Error stack:', error.stack);
       res.status(500).json({ error: 'Error al actualizar el estudio' });
     }
   },

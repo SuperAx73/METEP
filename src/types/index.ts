@@ -15,6 +15,7 @@ export interface Study {
   piezasPorHora: number;
   taktime: number;
   tolerancia: number;
+  categories: string[];
   createdAt: Date;
   updatedAt: Date;
   records: Record[];

@@ -7,7 +7,7 @@ import {
   onAuthStateChanged,
   updateProfile
 } from 'firebase/auth';
-import { auth } from '../config/firebase';
+import { auth } from '../config/firebase.ts';
 import { User } from '../types';
 
 interface AuthContextType {

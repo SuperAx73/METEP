@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Study, Record } from '../types';
-import { getStudy, addRecord, deleteRecord, exportStudy } from '../services/api';
-import { ArrowLeft, Download, Trash2, Settings } from 'lucide-react';
+import { getStudy, addRecord, deleteRecord, exportStudy, updateStudy } from '../services/api';
+import { ArrowLeft, Download, Trash2, Settings, Edit, Save, X } from 'lucide-react';
 import Stopwatch from '../components/Stopwatch/Stopwatch';
 import RecordsTable from '../components/Study/RecordsTable';
+import StudyForm from '../components/Study/StudyForm';
 import Button from '../components/UI/Button';
 import Card from '../components/UI/Card';
 import LoadingSpinner from '../components/UI/LoadingSpinner';
@@ -22,12 +23,36 @@ const StudyDetail: React.FC = () => {
     categoriaCausa: '',
     comentario: ''
   });
+  const [isEditing, setIsEditing] = useState(false);
+  const [editLoading, setEditLoading] = useState(false);
+  const defaultCategories = [
+    'conveyor',
+    'falla de maquina',
+    'falta de alimentacion',
+    'flujo lento',
+    'linea llena'
+  ];
+
+  const [categories, setCategories] = useState<string[]>(defaultCategories);
+  const [newCategory, setNewCategory] = useState('');
+  const [showAddCategory, setShowAddCategory] = useState(false);
 
   useEffect(() => {
     if (id) {
       fetchStudy();
     }
   }, [id]);
+
+  // Update categories when study data changes
+  useEffect(() => {
+    if (study?.categories) {
+      // Combine default categories with study categories, ensuring no duplicates
+      const combined = [...defaultCategories, ...study.categories];
+      setCategories([...new Set(combined)]);
+    } else {
+      setCategories(defaultCategories);
+    }
+  }, [study?.categories]);
 
   const fetchStudy = async () => {
     try {
@@ -108,6 +133,42 @@ const StudyDetail: React.FC = () => {
     }
   };
 
+  const handleUpdateStudy = async (studyData: Omit<Study, 'id' | 'userId' | 'createdAt' | 'updatedAt' | 'records'>) => {
+    if (!study) return;
+
+    try {
+      setEditLoading(true);
+      const updatedStudy = await updateStudy(study.id, studyData);
+      setStudy(updatedStudy);
+      setIsEditing(false);
+      toast.success('Estudio actualizado exitosamente');
+    } catch (error) {
+      toast.error('Error al actualizar el estudio');
+    } finally {
+      setEditLoading(false);
+    }
+  };
+
+  const handleAddCategory = () => {
+    if (newCategory.trim() && !categories.includes(newCategory.trim().toLowerCase())) {
+      setCategories(prev => [...prev, newCategory.trim().toLowerCase()]);
+      setNewCategory('');
+      setShowAddCategory(false);
+      toast.success('Categoría agregada exitosamente');
+    } else if (categories.includes(newCategory.trim().toLowerCase())) {
+      toast.error('Esta categoría ya existe');
+    }
+  };
+
+  const handleRemoveCategory = (categoryToRemove: string) => {
+    if (defaultCategories.includes(categoryToRemove)) {
+      toast.error('No puedes eliminar las categorías predeterminadas');
+      return;
+    }
+    setCategories(prev => prev.filter(cat => cat !== categoryToRemove));
+    toast.success('Categoría eliminada exitosamente');
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -135,6 +196,39 @@ const StudyDetail: React.FC = () => {
       (study.taktime * study.records.length) / study.records.reduce((sum, r) => sum + r.tiempoCiclo, 0) * 100 : 0
   };
 
+  if (isEditing) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <Button
+              variant="outline"
+              onClick={() => setIsEditing(false)}
+            >
+              <X className="h-4 w-4 mr-2" />
+              Cancelar
+            </Button>
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">
+                Editar Estudio
+              </h1>
+              <p className="text-gray-600">Modifica los datos del estudio</p>
+            </div>
+          </div>
+        </div>
+
+        <Card title="Editar Datos del Estudio">
+          <StudyForm
+            initialData={study}
+            onSubmit={handleUpdateStudy}
+            onCancel={() => setIsEditing(false)}
+            loading={editLoading}
+          />
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -155,6 +249,13 @@ const StudyDetail: React.FC = () => {
         </div>
         
         <div className="flex items-center space-x-2">
+          <Button
+            variant="outline"
+            onClick={() => setIsEditing(true)}
+          >
+            <Edit className="h-4 w-4 mr-2" />
+            Editar
+          </Button>
           <Button
             variant="outline"
             onClick={handleExport}
@@ -236,12 +337,23 @@ const StudyDetail: React.FC = () => {
             
             <Card title="Información del Registro">
               <div className="space-y-4">
-                <Input
-                  label="Categoría de Causa"
-                  value={recordForm.categoriaCausa}
-                  onChange={(e) => setRecordForm(prev => ({ ...prev, categoriaCausa: e.target.value }))}
-                  placeholder="Ej: Falta de material, Ajuste de máquina..."
-                />
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Categoría de Causa
+                  </label>
+                  <select
+                    value={recordForm.categoriaCausa}
+                    onChange={(e) => setRecordForm(prev => ({ ...prev, categoriaCausa: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    <option value="">Selecciona una categoría</option>
+                    {categories.map((category) => (
+                      <option key={category} value={category}>
+                        {category}
+                      </option>
+                    ))}
+                  </select>
+                </div>
                 <Input
                   label="Comentario"
                   value={recordForm.comentario}
@@ -320,6 +432,72 @@ const StudyDetail: React.FC = () => {
               <div>
                 <label className="block text-sm font-medium text-gray-700">Última Actualización</label>
                 <p className="text-sm text-gray-900">{new Date(study.updatedAt).toLocaleDateString()}</p>
+              </div>
+            </div>
+          </Card>
+
+          <Card title="Categorías de Causa" className="lg:col-span-2">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <p className="text-sm text-gray-600">
+                  Categorías disponibles para clasificar las causas de microparos
+                </p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowAddCategory(!showAddCategory)}
+                >
+                  {showAddCategory ? 'Cancelar' : 'Agregar Categoría'}
+                </Button>
+              </div>
+
+              {showAddCategory && (
+                <div className="flex items-center space-x-2 p-4 bg-gray-50 rounded-lg">
+                  <Input
+                    placeholder="Nueva categoría..."
+                    value={newCategory}
+                    onChange={(e) => setNewCategory(e.target.value)}
+                    className="flex-1"
+                  />
+                  <Button
+                    size="sm"
+                    onClick={handleAddCategory}
+                    disabled={!newCategory.trim()}
+                  >
+                    Agregar
+                  </Button>
+                </div>
+              )}
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+                {categories.map((category) => {
+                  const isDefault = defaultCategories.includes(category);
+                  return (
+                    <div
+                      key={category}
+                      className={`flex items-center justify-between p-3 rounded-lg border ${
+                        isDefault ? 'bg-blue-50 border-blue-200' : 'bg-gray-50 border-gray-200'
+                      }`}
+                    >
+                      <span className={`text-sm font-medium ${
+                        isDefault ? 'text-blue-700' : 'text-gray-700'
+                      }`}>
+                        {category}
+                        {isDefault && (
+                          <span className="ml-2 text-xs text-blue-500">(predeterminada)</span>
+                        )}
+                      </span>
+                      {!isDefault && (
+                        <button
+                          onClick={() => handleRemoveCategory(category)}
+                          className="text-red-500 hover:text-red-700 text-sm"
+                        >
+                          ×
+                        </button>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </Card>

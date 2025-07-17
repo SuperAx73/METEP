@@ -40,5 +40,10 @@ app.use('*', (req, res) => {
   res.status(404).json({ error: 'Ruta no encontrada' });
 });
 
+const PORT = config.port || 3001;
+app.listen(PORT, () => {
+  Logger.info(`Servidor escuchando en el puerto ${PORT}`);
+});
+
 // For serverless deployment (Vercel)
 export default app;

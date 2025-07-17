@@ -8,7 +8,20 @@ export const studyValidationSchema = Joi.object({
   familia: Joi.string().required().min(1).max(50),
   piezasPorHora: Joi.number().required().min(1).max(10000),
   taktime: Joi.number().required().min(0.1).max(3600),
-  tolerancia: Joi.number().required().min(0.01).max(60)
+  tolerancia: Joi.number().required().min(0.01).max(60),
+  categories: Joi.array().items(Joi.string()).optional().default([])
+});
+
+export const studyUpdateValidationSchema = Joi.object({
+  responsable: Joi.string().optional().min(2).max(100),
+  supervisor: Joi.string().optional().min(2).max(100),
+  linea: Joi.string().optional().min(1).max(50),
+  modelo: Joi.string().optional().min(1).max(50),
+  familia: Joi.string().optional().min(1).max(50),
+  piezasPorHora: Joi.number().optional().min(1).max(10000),
+  taktime: Joi.number().optional().min(0.1).max(3600),
+  tolerancia: Joi.number().optional().min(0.01).max(60),
+  categories: Joi.array().items(Joi.string()).optional().default([])
 });
 
 export const recordValidationSchema = Joi.object({
