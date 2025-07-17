@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Study } from '../types';
-import { apiService } from '../services/api';
+import { getStudies, createStudy, updateStudy, deleteStudy, exportStudy } from '../services/api';
 import { Plus, Search } from 'lucide-react';
 import StudyCard from '../components/Study/StudyCard';
 import StudyForm from '../components/Study/StudyForm';
@@ -28,7 +28,7 @@ const Studies: React.FC = () => {
   const fetchStudies = async () => {
     try {
       setLoading(true);
-      const data = await apiService.getStudies();
+      const data = await getStudies();
       setStudies(data);
     } catch (error) {
       toast.error('Error al cargar los estudios');
@@ -40,7 +40,7 @@ const Studies: React.FC = () => {
   const handleCreateStudy = async (studyData: Omit<Study, 'id' | 'userId' | 'createdAt' | 'updatedAt' | 'records'>) => {
     try {
       setFormLoading(true);
-      const newStudy = await apiService.createStudy(studyData);
+      const newStudy = await createStudy(studyData);
       setStudies(prev => [newStudy, ...prev]);
       setShowForm(false);
       toast.success('Estudio creado exitosamente');
@@ -56,7 +56,7 @@ const Studies: React.FC = () => {
 
     try {
       setFormLoading(true);
-      const updatedStudy = await apiService.updateStudy(editingStudy.id, studyData);
+      const updatedStudy = await updateStudy(editingStudy.id, studyData);
       setStudies(prev => prev.map(s => s.id === editingStudy.id ? updatedStudy : s));
       setEditingStudy(null);
       setShowForm(false);
@@ -74,7 +74,7 @@ const Studies: React.FC = () => {
     }
 
     try {
-      await apiService.deleteStudy(study.id);
+      await deleteStudy(study.id);
       setStudies(prev => prev.filter(s => s.id !== study.id));
       toast.success('Estudio eliminado exitosamente');
     } catch (error) {
@@ -84,7 +84,7 @@ const Studies: React.FC = () => {
 
   const handleExportStudy = async (study: Study) => {
     try {
-      const blob = await apiService.exportToExcel(study.id);
+      const blob = await exportStudy(study.id);
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
