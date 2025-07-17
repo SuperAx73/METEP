@@ -321,3 +321,30 @@ Al editar este proyecto, mantén siempre:
 ---
 
 **Nota**: Este README debe ser consultado antes de realizar cualquier modificación al proyecto para asegurar que se mantengan los estándares y restricciones establecidos. 
+
+## Configuración de Variables de Entorno
+
+Para que la aplicación funcione correctamente, necesitas configurar las siguientes variables de entorno:
+
+Crea un archivo `.env` en la raíz del proyecto con las siguientes variables:
+
+```env
+# Firebase Configuration
+VITE_FIREBASE_API_KEY=your-api-key
+VITE_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
+VITE_FIREBASE_PROJECT_ID=your-project-id
+VITE_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
+VITE_FIREBASE_MESSAGING_SENDER_ID=your-sender-id
+VITE_FIREBASE_APP_ID=your-app-id
+
+# API Configuration
+VITE_API_BASE_URL=http://localhost:3001/api
+```
+
+**Nota**: Si estás haciendo deploy sin configurar estas variables, la aplicación mostrará advertencias en la consola pero seguirá funcionando con valores por defecto.
+
+## Deploy
+
+La aplicación está configurada para funcionar con servicios de deploy como Vercel, Netlify, etc. 
+
+Para deploys que requieren configuración de variables de entorno, asegúrate de agregar todas las variables VITE_* en la configuración del servicio de deploy. 
