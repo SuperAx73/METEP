@@ -40,8 +40,8 @@ export class Study {
   static async findByUserId(userId) {
     try {
       const snapshot = await db.collection('studies')
-        .where('userId', '==', userId)
         .orderBy('createdAt', 'desc')
+        .where('userId', '==', userId)
         .get();
       
       return snapshot.docs.map(doc => new Study({ id: doc.id, ...doc.data() }));
