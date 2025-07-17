@@ -38,16 +38,20 @@ export class Study {
   }
 
   static async findByUserId(userId) {
+    if (!userId) {
+      Logger.error('userId is required for findByUserId');
+      throw new Error('userId is required');
+    }
     try {
       const snapshot = await db.collection('studies')
-        .orderBy('createdAt', 'desc')
         .where('userId', '==', userId)
+        .orderBy('createdAt', 'desc')
         .get();
       
       return snapshot.docs.map(doc => new Study({ id: doc.id, ...doc.data() }));
     } catch (error) {
       Logger.error('Error finding studies:', error);
-      throw new Error('Error al obtener los estudios');
+      throw new Error('Error al obtener los estudios: ' + error.message);
     }
   }
 
