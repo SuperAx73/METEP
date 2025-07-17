@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Study, Record } from '../types';
-import { apiService } from '../services/api';
+import { getStudy, addRecord, deleteRecord, exportStudy } from '../services/api';
 import { ArrowLeft, Download, Trash2, Settings } from 'lucide-react';
 import Stopwatch from '../components/Stopwatch/Stopwatch';
 import RecordsTable from '../components/Study/RecordsTable';
@@ -32,7 +32,7 @@ const StudyDetail: React.FC = () => {
   const fetchStudy = async () => {
     try {
       setLoading(true);
-      const data = await apiService.getStudy(id!);
+      const data = await getStudy(id!);
       setStudy(data);
     } catch (error) {
       toast.error('Error al cargar el estudio');
@@ -54,10 +54,11 @@ const StudyDetail: React.FC = () => {
         fecha: now.toLocaleDateString(),
         hora: now.toLocaleTimeString(),
         categoriaCausa: recordForm.categoriaCausa,
-        comentario: recordForm.comentario
+        comentario: recordForm.comentario,
+        numeroMuestra: study.records.length + 1
       };
 
-      await apiService.addRecord(study.id, recordData);
+      await addRecord(study.id, recordData);
       await fetchStudy(); // Refresh study data
       
       // Clear form
@@ -77,7 +78,10 @@ const StudyDetail: React.FC = () => {
     }
 
     try {
-      await apiService.clearRecords(study.id);
+      // Elimina todos los registros usando deleteRecord
+      for (const record of study.records) {
+        await deleteRecord(study.id, record.id);
+      }
       await fetchStudy();
       toast.success('Registros eliminados exitosamente');
     } catch (error) {
@@ -89,7 +93,7 @@ const StudyDetail: React.FC = () => {
     if (!study) return;
 
     try {
-      const blob = await apiService.exportToExcel(study.id);
+      const blob = await exportStudy(study.id);
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
