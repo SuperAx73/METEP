@@ -40,10 +40,5 @@ app.use('*', (req, res) => {
   res.status(404).json({ error: 'Ruta no encontrada' });
 });
 
-// Start server
-const PORT = config.port;
-app.listen(PORT, () => {
-  Logger.info(`Server running on port ${PORT} in ${config.nodeEnv} mode`);
-});
-
+// For serverless deployment (Vercel)
 export default app;
