@@ -7,6 +7,12 @@ export const studyController = {
     try {
       Logger.info('Received study data:', JSON.stringify(req.body));
       
+      // Clean categories to remove duplicates
+      if (req.body.categories && Array.isArray(req.body.categories)) {
+        req.body.categories = [...new Set(req.body.categories)];
+        Logger.info('Cleaned categories:', req.body.categories);
+      }
+
       const studyData = {
         ...req.body,
         userId: req.user.uid
@@ -74,6 +80,12 @@ export const studyController = {
       }
 
       Logger.info('Study found, updating with data:', JSON.stringify(req.body));
+      
+      // Clean categories to remove duplicates
+      if (req.body.categories && Array.isArray(req.body.categories)) {
+        req.body.categories = [...new Set(req.body.categories)];
+        Logger.info('Cleaned categories:', req.body.categories);
+      }
       
       Object.assign(study, req.body);
       Logger.info('Study object after update:', JSON.stringify(study));

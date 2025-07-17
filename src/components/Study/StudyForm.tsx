@@ -37,9 +37,10 @@ const StudyForm: React.FC<StudyFormProps> = ({
 
   const [categories, setCategories] = useState<string[]>(() => {
     if (initialData?.categories) {
+      // Clean existing categories first (remove duplicates)
+      const cleanedExistingCategories = [...new Set(initialData.categories)];
       // Combine default categories with existing ones, ensuring no duplicates
-      const existingCategories = initialData.categories;
-      const combined = [...defaultCategories, ...existingCategories];
+      const combined = [...defaultCategories, ...cleanedExistingCategories];
       return [...new Set(combined)]; // Remove duplicates
     }
     return defaultCategories;

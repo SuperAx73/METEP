@@ -46,8 +46,10 @@ const StudyDetail: React.FC = () => {
   // Update categories when study data changes
   useEffect(() => {
     if (study?.categories) {
+      // Clean existing categories first (remove duplicates)
+      const cleanedStudyCategories = [...new Set(study.categories)];
       // Combine default categories with study categories, ensuring no duplicates
-      const combined = [...defaultCategories, ...study.categories];
+      const combined = [...defaultCategories, ...cleanedStudyCategories];
       setCategories([...new Set(combined)]);
     } else {
       setCategories(defaultCategories);
