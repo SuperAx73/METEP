@@ -10,6 +10,7 @@ import Button from '../components/UI/Button';
 import Card from '../components/UI/Card';
 import LoadingSpinner from '../components/UI/LoadingSpinner';
 import Input from '../components/UI/Input';
+import Modal from '../components/UI/Modal';
 import toast from 'react-hot-toast';
 
 const StudyDetail: React.FC = () => {
@@ -25,6 +26,8 @@ const StudyDetail: React.FC = () => {
   });
   const [isEditing, setIsEditing] = useState(false);
   const [editLoading, setEditLoading] = useState(false);
+  const [currentTime, setCurrentTime] = useState<number | null>(null);
+  const [showRecordForm, setShowRecordForm] = useState(false);
   const defaultCategories = [
     'conveyor',
     'falla de maquina',
@@ -72,16 +75,26 @@ const StudyDetail: React.FC = () => {
   const handleRecordTime = async (time: number) => {
     if (!study) return;
 
+    const isMicroparo = time > (study.taktime + study.tolerancia);
+    
+    // Si es un microparo, mostrar el formulario para capturar información
+    if (isMicroparo) {
+      setCurrentTime(time);
+      setShowRecordForm(true);
+      return;
+    }
+
+    // Si no es microparo, guardar directamente sin información adicional
     try {
       const now = new Date();
       const recordData = {
         tiempoCiclo: time,
         desviacion: time - study.taktime,
-        esMicroparo: time > (study.taktime + study.tolerancia),
+        esMicroparo: false,
         fecha: now.toLocaleDateString(),
         hora: now.toLocaleTimeString(),
-        categoriaCausa: recordForm.categoriaCausa,
-        comentario: recordForm.comentario,
+        categoriaCausa: '',
+        comentario: '',
         numeroMuestra: study.records.length + 1
       };
 
@@ -95,9 +108,6 @@ const StudyDetail: React.FC = () => {
           records: [...prevStudy.records, newRecord]
         };
       });
-      
-      // Clear form
-      setRecordForm({ categoriaCausa: '', comentario: '' });
       
       toast.success('Registro agregado exitosamente');
     } catch (error) {
@@ -175,6 +185,50 @@ const StudyDetail: React.FC = () => {
     } finally {
       setEditLoading(false);
     }
+  };
+
+  const handleSaveMicroparo = async () => {
+    if (!study || !currentTime) return;
+
+    try {
+      const now = new Date();
+      const recordData = {
+        tiempoCiclo: currentTime,
+        desviacion: currentTime - study.taktime,
+        esMicroparo: true,
+        fecha: now.toLocaleDateString(),
+        hora: now.toLocaleTimeString(),
+        categoriaCausa: recordForm.categoriaCausa,
+        comentario: recordForm.comentario,
+        numeroMuestra: study.records.length + 1
+      };
+
+      const newRecord = await addRecord(study.id, recordData);
+      
+      // Update study state locally without refetching
+      setStudy(prevStudy => {
+        if (!prevStudy) return prevStudy;
+        return {
+          ...prevStudy,
+          records: [...prevStudy.records, newRecord]
+        };
+      });
+      
+      // Clear form and hide
+      setRecordForm({ categoriaCausa: '', comentario: '' });
+      setShowRecordForm(false);
+      setCurrentTime(null);
+      
+      toast.success('Microparo registrado exitosamente');
+    } catch (error) {
+      toast.error('Error al registrar el microparo');
+    }
+  };
+
+  const handleCancelMicroparo = () => {
+    setShowRecordForm(false);
+    setCurrentTime(null);
+    setRecordForm({ categoriaCausa: '', comentario: '' });
   };
 
   const handleAddCategory = () => {
@@ -363,46 +417,30 @@ const StudyDetail: React.FC = () => {
               <Stopwatch onRecordTime={handleRecordTime} />
             </div>
             
-            <Card title="Información del Registro">
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Categoría de Causa
-                  </label>
-                  <select
-                    value={recordForm.categoriaCausa}
-                    onChange={(e) => setRecordForm(prev => ({ ...prev, categoriaCausa: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  >
-                    <option value="">Selecciona una categoría</option>
-                    {categories.map((category) => (
-                      <option key={category} value={category}>
-                        {category}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <Input
-                  label="Comentario"
-                  value={recordForm.comentario}
-                  onChange={(e) => setRecordForm(prev => ({ ...prev, comentario: e.target.value }))}
-                  placeholder="Comentario adicional..."
-                />
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <div className="grid grid-cols-2 gap-4 text-sm">
-                    <div>
-                      <span className="font-medium">Taktime:</span> {study.taktime}s
-                    </div>
-                    <div>
-                      <span className="font-medium">Tolerancia:</span> {study.tolerancia}s
-                    </div>
-                    <div>
-                      <span className="font-medium">Umbral Microparo:</span> {study.taktime + study.tolerancia}s
-                    </div>
-                    <div>
-                      <span className="font-medium">Siguiente Muestra:</span> #{study.records.length + 1}
-                    </div>
+            <Card title="Información del Estudio">
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <span className="font-medium">Taktime:</span> {study.taktime}s
                   </div>
+                  <div>
+                    <span className="font-medium">Tolerancia:</span> {study.tolerancia}s
+                  </div>
+                  <div>
+                    <span className="font-medium">Umbral Microparo:</span> {study.taktime + study.tolerancia}s
+                  </div>
+                  <div>
+                    <span className="font-medium">Siguiente Muestra:</span> #{study.records.length + 1}
+                  </div>
+                </div>
+                <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                    <span className="text-sm font-medium text-blue-800">Estado Normal</span>
+                  </div>
+                  <p className="text-sm text-blue-700 mt-1">
+                    Las piezas dentro del rango se guardan automáticamente
+                  </p>
                 </div>
               </div>
             </Card>
@@ -531,6 +569,69 @@ const StudyDetail: React.FC = () => {
           </Card>
         </div>
       )}
+
+      {/* Modal para registrar microparo */}
+      <Modal
+        isOpen={showRecordForm}
+        onClose={handleCancelMicroparo}
+        title="Registrar Microparo"
+        className="border-red-200 bg-red-50"
+      >
+        <div className="space-y-4">
+          <div className="bg-red-100 border border-red-300 rounded-lg p-4">
+            <div className="flex items-center space-x-2">
+              <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+              <span className="font-medium text-red-800">Microparo Detectado</span>
+            </div>
+            <p className="text-sm text-red-700 mt-2">
+              Tiempo: {currentTime?.toFixed(1)}s (Umbral: {study?.taktime + study?.tolerancia}s)
+            </p>
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Categoría de Causa *
+            </label>
+            <select
+              value={recordForm.categoriaCausa}
+              onChange={(e) => setRecordForm(prev => ({ ...prev, categoriaCausa: e.target.value }))}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
+              required
+            >
+              <option value="">Selecciona una categoría</option>
+              {categories.map((category) => (
+                <option key={category} value={category}>
+                  {category}
+                </option>
+              ))}
+            </select>
+          </div>
+          
+          <Input
+            label="Comentario"
+            value={recordForm.comentario}
+            onChange={(e) => setRecordForm(prev => ({ ...prev, comentario: e.target.value }))}
+            placeholder="Describe la causa del microparo..."
+          />
+          
+          <div className="flex space-x-3">
+            <Button
+              onClick={handleSaveMicroparo}
+              disabled={!recordForm.categoriaCausa}
+              className="flex-1 bg-red-600 hover:bg-red-700 focus:ring-red-500"
+            >
+              Guardar Microparo
+            </Button>
+            <Button
+              variant="outline"
+              onClick={handleCancelMicroparo}
+              className="flex-1"
+            >
+              Cancelar
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 };
