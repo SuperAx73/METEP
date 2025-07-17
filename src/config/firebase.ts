@@ -2,42 +2,14 @@ import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
-// Validate Firebase configuration
-const apiKey = import.meta.env.VITE_FIREBASE_API_KEY;
-const authDomain = import.meta.env.VITE_FIREBASE_AUTH_DOMAIN;
-const projectId = import.meta.env.VITE_FIREBASE_PROJECT_ID;
-const storageBucket = import.meta.env.VITE_FIREBASE_STORAGE_BUCKET;
-const messagingSenderId = import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID;
-const appId = import.meta.env.VITE_FIREBASE_APP_ID;
-
-// Check if we're in development mode
-const isDev = import.meta.env.DEV;
-
-if (!apiKey || apiKey === 'your-api-key') {
-  const errorMessage = 'Firebase API Key is missing or invalid. Please check your .env file and ensure VITE_FIREBASE_API_KEY is set to your actual Firebase Web API Key from the Firebase Console.';
-  if (isDev) {
-    console.error(errorMessage);
-  } else {
-    console.warn('Firebase not configured properly. Some features may not work.');
-  }
-}
-
-if (!authDomain || !projectId || !storageBucket || !messagingSenderId || !appId) {
-  const errorMessage = 'Firebase configuration is incomplete. Please check your .env file and ensure all Firebase environment variables are properly set.';
-  if (isDev) {
-    console.error(errorMessage);
-  } else {
-    console.warn('Firebase configuration incomplete. Some features may not work.');
-  }
-}
-
+// Configuración directa con credenciales reales
 const firebaseConfig = {
-  apiKey: apiKey || 'demo-key',
-  authDomain: authDomain || 'demo.firebaseapp.com',
-  projectId: projectId || 'demo-project',
-  storageBucket: storageBucket || 'demo-project.appspot.com',
-  messagingSenderId: messagingSenderId || '123456789',
-  appId: appId || 'demo-app-id'
+  apiKey: "AIzaSyDVNI60P1CurCz2Z7uxTrv0gtGFrRjKj5E",
+  authDomain: "microparos-70a6b.firebaseapp.com",
+  projectId: "microparos-70a6b",
+  storageBucket: "microparos-70a6b.appspot.com",
+  messagingSenderId: "836038704396",
+  appId: "1:836038704396:web:36b9d0d7516877ee9a9d29"
 };
 
 const app = initializeApp(firebaseConfig);
