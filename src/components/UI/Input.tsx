@@ -1,9 +1,12 @@
 import React, { InputHTMLAttributes } from 'react';
+import { jsx, jsxs } from 'react/jsx-runtime';
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   error?: string;
   helper?: string;
+  className?: string;
+  type?: string;
 }
 
 const Input: React.FC<InputProps> = ({ 
@@ -12,7 +15,7 @@ const Input: React.FC<InputProps> = ({
   helper, 
   className = '', 
   ...props 
-}) => {
+}: InputProps) => {
   return (
     <div className="mb-4">
       {label && (
@@ -25,6 +28,7 @@ const Input: React.FC<InputProps> = ({
           error ? 'border-red-500' : 'border-gray-300'
         } ${className}`}
         {...props}
+        style={props.type === 'number' ? { MozAppearance: 'textfield', appearance: 'textfield', WebkitAppearance: 'none' } : {}}
       />
       {error && (
         <p className="mt-1 text-sm text-red-600">{error}</p>

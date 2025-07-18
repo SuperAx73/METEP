@@ -30,6 +30,8 @@ const StudyDetail: React.FC = () => {
   const [editLoading, setEditLoading] = useState(false);
   const [currentTime, setCurrentTime] = useState<number | null>(null);
   const [showRecordForm, setShowRecordForm] = useState(false);
+  const [microparoStartTime, setMicroparoStartTime] = useState<string | null>(null);
+  const [taktimeCrossedTime, setTaktimeCrossedTime] = useState<string | null>(null);
   const defaultCategories = [
     'conveyor',
     'falla de maquina',
@@ -74,14 +76,19 @@ const StudyDetail: React.FC = () => {
     }
   };
 
+  const handleTaktimeReached = (hora: string) => {
+    setTaktimeCrossedTime(hora);
+  };
+
   const handleRecordTime = async (time: number) => {
     if (!study) return;
 
     const isMicroparo = time > (study.taktime + study.tolerancia);
     
-    // Si es un microparo, mostrar el formulario para capturar información
+    // Si es un microparo, usar la hora en la que se cruzó el taktime
     if (isMicroparo) {
       setCurrentTime(time);
+      setMicroparoStartTime(taktimeCrossedTime || new Date().toLocaleTimeString());
       setShowRecordForm(true);
       return;
     }
@@ -198,12 +205,18 @@ const StudyDetail: React.FC = () => {
 
     try {
       const now = new Date();
+      const desviacion = currentTime - study.taktime;
+      // Calcular la hora de inicio del microparo restando la desviación a la hora de fin
+      const horaFin = now;
+      const horaInicioDate = new Date(horaFin.getTime() - desviacion * 1000);
+      const horaInicioMicroparo = horaInicioDate.toLocaleTimeString();
       const recordData = {
         tiempoCiclo: currentTime,
-        desviacion: currentTime - study.taktime,
+        desviacion,
         esMicroparo: true,
         fecha: now.toLocaleDateString(),
-        hora: now.toLocaleTimeString(),
+        hora: horaFin.toLocaleTimeString(),
+        horaInicioMicroparo,
         categoriaCausa: recordForm.categoriaCausa,
         comentario: recordForm.comentario,
         numeroMuestra: study.records.length + 1
@@ -224,6 +237,8 @@ const StudyDetail: React.FC = () => {
       setRecordForm({ categoriaCausa: '', comentario: '' });
       setShowRecordForm(false);
       setCurrentTime(null);
+      setMicroparoStartTime(null);
+      setTaktimeCrossedTime(null);
       
       toast.success('Microparo registrado exitosamente');
     } catch (error) {
@@ -235,6 +250,8 @@ const StudyDetail: React.FC = () => {
     setShowRecordForm(false);
     setCurrentTime(null);
     setRecordForm({ categoriaCausa: '', comentario: '' });
+    setMicroparoStartTime(null);
+    setTaktimeCrossedTime(null);
   };
 
   const handleAddCategory = () => {
@@ -422,7 +439,11 @@ const StudyDetail: React.FC = () => {
         <div className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div>
-              <Stopwatch onRecordTime={handleRecordTime} />
+              <Stopwatch
+                onRecordTime={handleRecordTime}
+                taktime={study.taktime}
+                onTaktimeReached={handleTaktimeReached}
+              />
             </div>
             
             <Card title="Información del Estudio">

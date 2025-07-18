@@ -60,10 +60,22 @@ const StudyForm: React.FC<StudyFormProps> = ({
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'number' ? parseFloat(value) || 0 : value
-    }));
+    if (type === 'number') {
+      const numValue = parseFloat(value);
+      // Solo permitir valores mayores a cero para los campos numéricos relevantes
+      if ((name === 'taktime' && numValue <= 0) || (name === 'tolerancia' && numValue <= 0) || (name === 'piezasPorHora' && numValue <= 0)) {
+        return;
+      }
+      setFormData(prev => ({
+        ...prev,
+        [name]: numValue || ''
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    }
   };
 
   const handleAddCategory = () => {

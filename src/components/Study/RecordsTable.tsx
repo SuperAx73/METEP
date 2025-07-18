@@ -36,6 +36,9 @@ const RecordsTable: React.FC<RecordsTableProps> = ({ records }) => {
                 Hora
               </th>
               <th className="px-2 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Hora Inicio Microparo
+              </th>
+              <th className="px-2 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Categoría
               </th>
               <th className="px-2 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -84,6 +87,9 @@ const RecordsTable: React.FC<RecordsTableProps> = ({ records }) => {
                   </td>
                   <td className="px-2 sm:px-6 py-2 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500">
                     {record.hora}
+                  </td>
+                  <td className="px-2 sm:px-6 py-2 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500">
+                    {record.horaInicioMicroparo || ''}
                   </td>
                   <td className="px-2 sm:px-6 py-2 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500">
                     {record.categoriaCausa || '-'}
