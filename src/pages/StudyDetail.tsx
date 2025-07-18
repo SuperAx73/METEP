@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Study, Record } from '../types';
-import { getStudy, addRecord, deleteRecord, exportStudy, updateStudy } from '../services/api';
+import { getStudy, addRecord, deleteRecord, exportStudy, updateStudy, getAuthHeader } from '../services/api';
 import { ArrowLeft, Download, Trash2, Settings, Edit, Save, X } from 'lucide-react';
 import Stopwatch from '../components/Stopwatch/Stopwatch';
 import RecordsTable from '../components/Study/RecordsTable';
@@ -12,6 +12,8 @@ import LoadingSpinner from '../components/UI/LoadingSpinner';
 import Input from '../components/UI/Input';
 import Modal from '../components/UI/Modal';
 import toast from 'react-hot-toast';
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
 
 const StudyDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -117,18 +119,23 @@ const StudyDetail: React.FC = () => {
 
   const handleClearRecords = async () => {
     if (!study) return;
-    
+
     if (!window.confirm('¿Estás seguro de que quieres eliminar todos los registros?')) {
       return;
     }
 
     try {
-      // Elimina todos los registros usando deleteRecord
-      for (const record of study.records) {
-        await deleteRecord(study.id, record.id);
+      // Llamar al nuevo endpoint eficiente
+      const headers = await getAuthHeader();
+      const res = await fetch(`${API_BASE_URL}/studies/${study.id}/records`, {
+        method: 'DELETE',
+        headers,
+      });
+      if (!res.ok) {
+        const error = await res.text();
+        throw new Error(error || 'Error al limpiar los registros');
       }
-      
-      // Update study state locally without refetching
+      // Limpiar el estado local
       setStudy(prevStudy => {
         if (!prevStudy) return prevStudy;
         return {
@@ -136,10 +143,9 @@ const StudyDetail: React.FC = () => {
           records: []
         };
       });
-      
       toast.success('Registros eliminados exitosamente');
-    } catch (error) {
-      toast.error('Error al eliminar los registros');
+    } catch (error: any) {
+      toast.error('Error al eliminar los registros: ' + (error.message || error));
     }
   };
 
