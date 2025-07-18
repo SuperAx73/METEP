@@ -31,6 +31,7 @@ export const recordValidationSchema = Joi.object({
   desviacion: Joi.number().required(),
   fecha: Joi.date().required(),
   hora: Joi.string().required(),
+  horaInicioMicroparo: Joi.string().optional().allow(''),
   categoriaCausa: Joi.string().allow('').max(100),
   comentario: Joi.string().allow('').max(500)
 });
