@@ -53,8 +53,8 @@ const Login: React.FC = () => {
             <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
               <Factory className="h-8 w-8 text-blue-600" />
             </div>
-            <h1 className="text-2xl font-bold text-gray-900">METEP</h1>
-            <p className="text-gray-600">Análisis de Microparos Industriales</p>
+            <h1 className="text-2xl font-bold text-gray-900">MTEP</h1>
+            <p className="text-gray-600">Medición de Tiempos y Eficiencia de Producción</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
