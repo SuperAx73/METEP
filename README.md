@@ -1,14 +1,14 @@
-# METEP - Análisis de Microparos en Procesos Industriales
+# MTEP - Análisis de Microparos en Procesos Industriales
 
 ## 🎯 DESCRIPCIÓN DEL PROYECTO
 
-METEP es una herramienta web diseñada para medir la frecuencia con la que sale cada pieza en líneas de producción industrial, detectando y categorizando microparos para análisis posterior. La aplicación permite realizar estudios detallados de eficiencia y generar reportes completos en formato Excel.
+MTEP es una herramienta web diseñada para medir la frecuencia con la que sale cada pieza en líneas de producción industrial, detectando y categorizando microparos para análisis posterior. La aplicación permite realizar estudios detallados de eficiencia y generar reportes completos en formato Excel.
 
 ## 🏗️ ARQUITECTURA DEL PROYECTO
 
 ### Estructura de Carpetas
 ```
-METEP/
+MTEP/
 ├── backend/                    # Servidor Node.js + Express
 │   ├── src/
 │   │   ├── controllers/        # Controladores de rutas
@@ -348,3 +348,5 @@ VITE_API_BASE_URL=http://localhost:3001/api
 La aplicación está configurada para funcionar con servicios de deploy como Vercel, Netlify, etc. 
 
 Para deploys que requieren configuración de variables de entorno, asegúrate de agregar todas las variables VITE_* en la configuración del servicio de deploy. 
+
+<!-- Cambio mínimo para forzar un push --> 
