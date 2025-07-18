@@ -30,6 +30,7 @@ const StudyDetail: React.FC = () => {
   const [editLoading, setEditLoading] = useState(false);
   const [currentTime, setCurrentTime] = useState<number | null>(null);
   const [showRecordForm, setShowRecordForm] = useState(false);
+  const [microparoStartTime, setMicroparoStartTime] = useState<string | null>(null);
   const defaultCategories = [
     'conveyor',
     'falla de maquina',
@@ -79,9 +80,10 @@ const StudyDetail: React.FC = () => {
 
     const isMicroparo = time > (study.taktime + study.tolerancia);
     
-    // Si es un microparo, mostrar el formulario para capturar información
+    // Si es un microparo, guardar la hora de inicio y mostrar el formulario
     if (isMicroparo) {
       setCurrentTime(time);
+      setMicroparoStartTime(new Date().toLocaleTimeString());
       setShowRecordForm(true);
       return;
     }
@@ -204,6 +206,7 @@ const StudyDetail: React.FC = () => {
         esMicroparo: true,
         fecha: now.toLocaleDateString(),
         hora: now.toLocaleTimeString(),
+        horaInicioMicroparo: microparoStartTime || '',
         categoriaCausa: recordForm.categoriaCausa,
         comentario: recordForm.comentario,
         numeroMuestra: study.records.length + 1
@@ -224,6 +227,7 @@ const StudyDetail: React.FC = () => {
       setRecordForm({ categoriaCausa: '', comentario: '' });
       setShowRecordForm(false);
       setCurrentTime(null);
+      setMicroparoStartTime(null);
       
       toast.success('Microparo registrado exitosamente');
     } catch (error) {
@@ -235,6 +239,7 @@ const StudyDetail: React.FC = () => {
     setShowRecordForm(false);
     setCurrentTime(null);
     setRecordForm({ categoriaCausa: '', comentario: '' });
+    setMicroparoStartTime(null);
   };
 
   const handleAddCategory = () => {
