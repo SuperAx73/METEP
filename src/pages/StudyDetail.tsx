@@ -205,13 +205,18 @@ const StudyDetail: React.FC = () => {
 
     try {
       const now = new Date();
+      const desviacion = currentTime - study.taktime;
+      // Calcular la hora de inicio del microparo restando la desviación a la hora de fin
+      const horaFin = now;
+      const horaInicioDate = new Date(horaFin.getTime() - desviacion * 1000);
+      const horaInicioMicroparo = horaInicioDate.toLocaleTimeString();
       const recordData = {
         tiempoCiclo: currentTime,
-        desviacion: currentTime - study.taktime,
+        desviacion,
         esMicroparo: true,
         fecha: now.toLocaleDateString(),
-        hora: now.toLocaleTimeString(),
-        horaInicioMicroparo: microparoStartTime || '',
+        hora: horaFin.toLocaleTimeString(),
+        horaInicioMicroparo,
         categoriaCausa: recordForm.categoriaCausa,
         comentario: recordForm.comentario,
         numeroMuestra: study.records.length + 1
