@@ -1,14 +1,37 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Play, Pause, RotateCcw } from 'lucide-react';
 import { useStopwatch } from '../../hooks/useStopwatch';
 import Button from '../UI/Button';
 
 interface StopwatchProps {
   onRecordTime: (time: number) => void;
+  taktime: number;
+  onTaktimeReached?: (hora: string) => void;
 }
 
-const Stopwatch: React.FC<StopwatchProps> = ({ onRecordTime }) => {
+const Stopwatch: React.FC<StopwatchProps> = ({ onRecordTime, taktime, onTaktimeReached }) => {
   const { formattedTime, isRunning, start, pause, reset, getCurrentTime } = useStopwatch();
+  const prevTimeRef = useRef<number>(0);
+  const taktimeReachedRef = useRef<boolean>(false);
+
+  useEffect(() => {
+    if (!isRunning) {
+      taktimeReachedRef.current = false;
+      prevTimeRef.current = 0;
+      return;
+    }
+    const interval = setInterval(() => {
+      const currentTime = getCurrentTime();
+      if (!taktimeReachedRef.current && prevTimeRef.current < taktime && currentTime >= taktime) {
+        taktimeReachedRef.current = true;
+        if (onTaktimeReached) {
+          onTaktimeReached(new Date().toLocaleTimeString());
+        }
+      }
+      prevTimeRef.current = currentTime;
+    }, 50);
+    return () => clearInterval(interval);
+  }, [isRunning, taktime, getCurrentTime, onTaktimeReached]);
 
   const handlePieceReady = () => {
     if (isRunning) {
