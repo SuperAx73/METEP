@@ -132,22 +132,23 @@ const Studies: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Estudios</h1>
-          <p className="text-gray-600">Gestiona tus estudios de microparos industriales</p>
+          <p className="text-gray-600 text-sm">Gestiona tus estudios de microparos industriales</p>
         </div>
         
         <Button
           onClick={() => setShowForm(true)}
+          className="w-full sm:w-auto"
         >
           <Plus className="h-4 w-4 mr-2" />
           Nuevo Estudio
         </Button>
       </div>
 
-      <div className="flex items-center space-x-4">
-        <div className="relative flex-1 max-w-md">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:space-x-4">
+        <div className="relative flex-1 max-w-full sm:max-w-md">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
           <Input
             type="text"
@@ -165,14 +166,14 @@ const Studies: React.FC = () => {
             {searchTerm ? 'No se encontraron estudios' : 'No hay estudios disponibles'}
           </div>
           {!searchTerm && (
-            <Button onClick={() => setShowForm(true)}>
+            <Button onClick={() => setShowForm(true)} className="w-full sm:w-auto">
               <Plus className="h-4 w-4 mr-2" />
               Crear tu primer estudio
             </Button>
           )}
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {filteredStudies.map(study => (
             <StudyCard
               key={study.id}

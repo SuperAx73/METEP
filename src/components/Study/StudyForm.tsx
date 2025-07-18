@@ -86,13 +86,14 @@ const StudyForm: React.FC<StudyFormProps> = ({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
         <Input
           label="Responsable del Estudio"
           name="responsable"
           value={formData.responsable}
           onChange={handleChange}
           required
+          className="w-full"
         />
         
         <Input
@@ -101,6 +102,7 @@ const StudyForm: React.FC<StudyFormProps> = ({
           value={formData.supervisor}
           onChange={handleChange}
           required
+          className="w-full"
         />
         
         <Input
@@ -109,6 +111,7 @@ const StudyForm: React.FC<StudyFormProps> = ({
           value={formData.linea}
           onChange={handleChange}
           required
+          className="w-full"
         />
         
         <Input
@@ -117,6 +120,7 @@ const StudyForm: React.FC<StudyFormProps> = ({
           value={formData.modelo}
           onChange={handleChange}
           required
+          className="w-full"
         />
         
         <Input
@@ -125,6 +129,7 @@ const StudyForm: React.FC<StudyFormProps> = ({
           value={formData.familia}
           onChange={handleChange}
           required
+          className="w-full"
         />
         
         <Input
@@ -135,6 +140,7 @@ const StudyForm: React.FC<StudyFormProps> = ({
           onChange={handleChange}
           required
           min="1"
+          className="w-full"
         />
         
         <Input
@@ -146,6 +152,7 @@ const StudyForm: React.FC<StudyFormProps> = ({
           onChange={handleChange}
           required
           min="0.1"
+          className="w-full"
         />
         
         <Input
@@ -157,12 +164,13 @@ const StudyForm: React.FC<StudyFormProps> = ({
           onChange={handleChange}
           required
           min="0.01"
+          className="w-full"
         />
       </div>
 
       {/* Categorías de Causa */}
       <div className="space-y-4">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
           <label className="block text-sm font-medium text-gray-700">
             Categorías de Causa
           </label>
@@ -171,13 +179,14 @@ const StudyForm: React.FC<StudyFormProps> = ({
             variant="outline"
             size="sm"
             onClick={() => setShowAddCategory(!showAddCategory)}
+            className="w-full sm:w-auto"
           >
             {showAddCategory ? 'Cancelar' : 'Agregar Categoría'}
           </Button>
         </div>
 
         {showAddCategory && (
-          <div className="flex items-center space-x-2 p-4 bg-gray-50 rounded-lg">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 p-4 bg-gray-50 rounded-lg">
             <Input
               placeholder="Nueva categoría..."
               value={newCategory}
@@ -189,13 +198,14 @@ const StudyForm: React.FC<StudyFormProps> = ({
               size="sm"
               onClick={handleAddCategory}
               disabled={!newCategory.trim()}
+              className="w-full sm:w-auto"
             >
               Agregar
             </Button>
           </div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
           {categories.map((category) => {
             const isDefault = defaultCategories.includes(category);
             return (
@@ -228,18 +238,20 @@ const StudyForm: React.FC<StudyFormProps> = ({
         </div>
       </div>
 
-      <div className="flex justify-end space-x-4">
+      <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-4">
         <Button
           type="button"
           variant="outline"
           onClick={onCancel}
           disabled={loading}
+          className="w-full sm:w-auto"
         >
           Cancelar
         </Button>
         <Button
           type="submit"
           loading={loading}
+          className="w-full sm:w-auto"
         >
           {initialData ? 'Actualizar' : 'Crear'} Estudio
         </Button>
