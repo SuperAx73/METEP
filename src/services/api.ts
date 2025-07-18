@@ -3,7 +3,7 @@ import { getAuth } from 'firebase/auth';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
 
-async function getAuthHeader() {
+export async function getAuthHeader() {
   const user = getAuth().currentUser;
   if (!user) throw new Error('Usuario no autenticado');
   const token = await user.getIdToken();
