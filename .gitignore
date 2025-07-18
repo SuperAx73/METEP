@@ -21,3 +21,14 @@ yarn-error.log*
 !postcss.config.js
 !eslint.config.js
 !eslint.config.mjs
+
+# Archivos informativos ignorados (excepto README.md)
+correccionies.txt
+SOLUCION_ENV.md
+CONFIGURACION_VERCEL.md
+SIGUIENTE_PASO_BACKEND.md
+CONFIGURACION_FIREBASE.md
+BOLT_PROMPT.md
+
+src/config/firebase.ts.backup
+backend/src/config/firebase.js.backup
