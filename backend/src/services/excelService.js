@@ -82,21 +82,35 @@ export class ExcelService {
       const paretoArray = Object.values(paretoData)
         .sort((a, b) => b.tiempoTotal - a.tiempoTotal);
 
-      paretoSheet.addRow(['Categoría', 'Frecuencia', 'Tiempo Total (seg)', 'Porcentaje']);
+      paretoSheet.addRow(['Categoría', 'Frecuencia', 'Tiempo Total (seg)', 'Porcentaje', 'Porcentaje Acumulado']);
       
       const totalTiempo = paretoArray.reduce((sum, item) => sum + item.tiempoTotal, 0);
       let acumulado = 0;
-      
+      let porcentajeAcumulado = 0;
+      // Ordenar el paretoArray de mayor a menor por porcentaje antes de agregar las filas
+      paretoArray.sort((a, b) => {
+        const porcentajeA = totalTiempo > 0 ? (a.tiempoTotal / totalTiempo) : 0;
+        const porcentajeB = totalTiempo > 0 ? (b.tiempoTotal / totalTiempo) : 0;
+        return porcentajeB - porcentajeA;
+      });
       paretoArray.forEach(item => {
         acumulado += item.tiempoTotal;
-        const porcentaje = totalTiempo > 0 ? (item.tiempoTotal / totalTiempo) * 100 : 0;
+        let porcentaje = totalTiempo > 0 ? (item.tiempoTotal / totalTiempo) : 0;
+        if (porcentaje > 1) porcentaje = 1;
+        porcentajeAcumulado += porcentaje;
+        if (porcentajeAcumulado > 1) porcentajeAcumulado = 1;
         paretoSheet.addRow([
           item.categoria,
           item.frecuencia,
           item.tiempoTotal,
-          Math.round(porcentaje * 100) / 100
+          porcentaje,
+          porcentajeAcumulado
         ]);
       });
+
+      // Formato de porcentaje para las columnas de porcentaje en la hoja de Pareto
+      paretoSheet.getColumn(4).numFmt = '0.00%';
+      paretoSheet.getColumn(5).numFmt = '0.00%';
 
       // Styling
       [resumenSheet, todosSheet, microparosSheet, paretoSheet].forEach(sheet => {
