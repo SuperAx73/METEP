@@ -8,6 +8,7 @@ import routes from './routes/index.js';
 import Logger from './utils/logger.js';
 
 const app = express();
+app.set('trust proxy', 1); // Confía en el proxy de Vercel para X-Forwarded-For
 
 // Security middleware
 app.use(helmet());
