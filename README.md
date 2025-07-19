@@ -8,7 +8,7 @@ MTEP es una herramienta web diseñada para medir la frecuencia con la que sale c
 
 ### Estructura de Carpetas
 ```
-MTEP/
+METEP/
 ├── backend/                    # Servidor Node.js + Express
 │   ├── src/
 │   │   ├── controllers/        # Controladores de rutas
@@ -20,23 +20,28 @@ MTEP/
 │   │   └── config/            # Configuraciones
 │   ├── package.json
 │   └── .env.example
-├── frontend/                   # Cliente React
-│   ├── src/
-│   │   ├── components/        # Componentes reutilizables
-│   │   ├── pages/            # Páginas de la aplicación
-│   │   ├── hooks/            # Hooks personalizados
-│   │   ├── services/         # Servicios para APIs
-│   │   ├── utils/            # Utilidades del frontend
-│   │   ├── types/            # Tipos TypeScript
-│   │   └── context/          # Context API
-│   ├── package.json
-│   └── vite.config.ts
+├── src/                        # Cliente React (Frontend)
+│   ├── components/            # Componentes reutilizables
+│   │   ├── Layout/           # Componentes de layout
+│   │   ├── Study/            # Componentes de estudios
+│   │   ├── Stopwatch/        # Componentes de cronómetro
+│   │   └── UI/               # Componentes de interfaz
+│   ├── pages/                # Páginas de la aplicación
+│   ├── hooks/                # Hooks personalizados
+│   ├── services/             # Servicios para APIs
+│   ├── types/                # Tipos TypeScript
+│   ├── context/              # Context API
+│   └── config/               # Configuraciones del frontend
+├── api/                       # API Routes (Vercel)
+├── public/                    # Archivos estáticos
+├── package.json               # Dependencias del frontend
+├── vite.config.ts            # Configuración de Vite
 └── README.md
 ```
 
 ### Arquitectura de Capas
 - **Presentación**: React + TypeScript (Frontend)
-- **API**: Express.js (Backend)
+- **API**: Express.js (Backend) + Vercel API Routes
 - **Lógica de Negocio**: Services (Backend)
 - **Persistencia**: Firebase Firestore
 - **Autenticación**: Firebase Auth + JWT
@@ -72,11 +77,12 @@ MTEP/
 
 ### Frontend
 - **React 18+** con TypeScript
-- **React Router v6** para navegación
+- **React Router v7** para navegación
 - **TailwindCSS** para estilos
 - **Lucide React** para iconos
 - **Axios** para peticiones HTTP
 - **Vite** como build tool
+- **React Hot Toast** para notificaciones
 
 ### Backend
 - **Node.js 18+** runtime
@@ -86,11 +92,16 @@ MTEP/
 - **Helmet, CORS, Rate Limiting** para seguridad
 - **Joi** para validación
 - **Custom Logger** para logs
+- **ExcelJS** para generación de reportes
 
 ### Base de Datos
 - **Firebase Firestore** (NoSQL)
 - **Firebase Auth** para autenticación
 - **Firebase Admin SDK** para backend
+
+### Deploy
+- **Vercel** para frontend y API routes
+- **Vercel Functions** para backend serverless
 
 ## 📊 ESTRUCTURA DE PANTALLAS
 
@@ -218,13 +229,13 @@ FIREBASE_PROJECT_ID=
 FIREBASE_PRIVATE_KEY=
 FIREBASE_CLIENT_EMAIL=
 JWT_SECRET=
-PORT=3000
+PORT=3001
 
 # Frontend
 VITE_FIREBASE_API_KEY=
 VITE_FIREBASE_AUTH_DOMAIN=
 VITE_FIREBASE_PROJECT_ID=
-VITE_API_URL=
+VITE_API_URL=http://localhost:3001/api
 ```
 
 ## 📱 RESPONSIVE DESIGN
@@ -259,18 +270,26 @@ VITE_API_URL=
 - Firebase project configurado
 - Variables de entorno establecidas
 
-### Comandos
+### Comandos de Desarrollo
 ```bash
-# Backend
+# Instalar dependencias del frontend
+npm install
+
+# Instalar dependencias del backend
 cd backend
 npm install
+
+# Ejecutar backend en modo desarrollo
 npm run dev
 
-# Frontend
-cd frontend
-npm install
+# En otra terminal, ejecutar frontend
 npm run dev
 ```
+
+### Puertos de Desarrollo
+- **Frontend**: http://localhost:5173
+- **Backend**: http://localhost:3001
+- **API Proxy**: Configurado en vite.config.ts
 
 ## 🔄 FLUJO DE DESARROLLO
 
@@ -326,8 +345,7 @@ Al editar este proyecto, mantén siempre:
 
 Para que la aplicación funcione correctamente, necesitas configurar las siguientes variables de entorno:
 
-Crea un archivo `.env` en la raíz del proyecto con las siguientes variables:
-
+### Frontend (.env)
 ```env
 # Firebase Configuration
 VITE_FIREBASE_API_KEY=your-api-key
@@ -341,12 +359,35 @@ VITE_FIREBASE_APP_ID=your-app-id
 VITE_API_BASE_URL=http://localhost:3001/api
 ```
 
+### Backend (.env)
+```env
+# Firebase Admin SDK
+FIREBASE_PROJECT_ID=your-project-id
+FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
+FIREBASE_CLIENT_EMAIL=firebase-adminsdk-xxxxx@your-project.iam.gserviceaccount.com
+
+# JWT Configuration
+JWT_SECRET=your-jwt-secret-key
+
+# Server Configuration
+PORT=3001
+NODE_ENV=development
+```
+
 **Nota**: Si estás haciendo deploy sin configurar estas variables, la aplicación mostrará advertencias en la consola pero seguirá funcionando con valores por defecto.
 
 ## Deploy
 
-La aplicación está configurada para funcionar con servicios de deploy como Vercel, Netlify, etc. 
+La aplicación está configurada para funcionar con Vercel:
 
-Para deploys que requieren configuración de variables de entorno, asegúrate de agregar todas las variables VITE_* en la configuración del servicio de deploy. 
+### Frontend + API Routes
+- Deploy automático desde GitHub
+- Configuración en `vercel.json`
+- Variables de entorno en dashboard de Vercel
 
-<!-- Cambio mínimo para forzar un push --> 
+### Backend (Opcional)
+- Puede ejecutarse como servidor independiente
+- Configurado para puerto 3001
+- Compatible con servicios como Railway, Render, etc.
+
+Para deploys que requieren configuración de variables de entorno, asegúrate de agregar todas las variables VITE_* y las variables del backend en la configuración del servicio de deploy. 
