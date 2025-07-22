@@ -42,6 +42,9 @@ const RecordsTable: React.FC<RecordsTableProps> = ({ records }) => {
                 Categoría
               </th>
               <th className="px-2 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Máquina
+              </th>
+              <th className="px-2 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Comentario
               </th>
             </tr>
@@ -93,6 +96,9 @@ const RecordsTable: React.FC<RecordsTableProps> = ({ records }) => {
                   </td>
                   <td className="px-2 sm:px-6 py-2 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500">
                     {record.categoriaCausa || '-'}
+                  </td>
+                  <td className="px-2 sm:px-6 py-2 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500">
+                    {record.esMicroparo ? (record.maquina || '-') : ''}
                   </td>
                   <td className="px-2 sm:px-6 py-2 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500">
                     <div className="max-w-32 truncate" title={record.comentario}>

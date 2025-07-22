@@ -24,7 +24,8 @@ const StudyDetail: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'capture' | 'data'>('capture');
   const [recordForm, setRecordForm] = useState({
     categoriaCausa: '',
-    comentario: ''
+    comentario: '',
+    maquina: ''
   });
   const [isEditing, setIsEditing] = useState(false);
   const [editLoading, setEditLoading] = useState(false);
@@ -219,6 +220,7 @@ const StudyDetail: React.FC = () => {
         horaInicioMicroparo,
         categoriaCausa: recordForm.categoriaCausa,
         comentario: recordForm.comentario,
+        maquina: recordForm.maquina,
         numeroMuestra: study.records.length + 1
       };
 
@@ -234,7 +236,7 @@ const StudyDetail: React.FC = () => {
       });
       
       // Clear form and hide
-      setRecordForm({ categoriaCausa: '', comentario: '' });
+      setRecordForm({ categoriaCausa: '', comentario: '', maquina: '' });
       setShowRecordForm(false);
       setCurrentTime(null);
       setMicroparoStartTime(null);
@@ -249,7 +251,7 @@ const StudyDetail: React.FC = () => {
   const handleCancelMicroparo = () => {
     setShowRecordForm(false);
     setCurrentTime(null);
-    setRecordForm({ categoriaCausa: '', comentario: '' });
+    setRecordForm({ categoriaCausa: '', comentario: '', maquina: '' });
     setMicroparoStartTime(null);
     setTaktimeCrossedTime(null);
   };
@@ -642,11 +644,32 @@ const StudyDetail: React.FC = () => {
             onChange={(e) => setRecordForm(prev => ({ ...prev, comentario: e.target.value }))}
             placeholder="Describe la causa del microparo..."
           />
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Máquina *
+            </label>
+            <select
+              value={recordForm.maquina}
+              onChange={(e) => setRecordForm(prev => ({ ...prev, maquina: e.target.value }))}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
+              required
+            >
+              <option value="">Selecciona una máquina</option>
+              {study.maquinas && study.maquinas.length > 0 ? (
+                study.maquinas.map((maquina: string) => (
+                  <option key={maquina} value={maquina}>{maquina}</option>
+                ))
+              ) : (
+                <option value="" disabled>No hay máquinas registradas</option>
+              )}
+            </select>
+          </div>
           
           <div className="flex space-x-3">
             <Button
               onClick={handleSaveMicroparo}
-              disabled={!recordForm.categoriaCausa}
+              disabled={!recordForm.categoriaCausa || !recordForm.maquina}
               className="flex-1 bg-red-600 hover:bg-red-700 focus:ring-red-500"
             >
               Guardar Microparo

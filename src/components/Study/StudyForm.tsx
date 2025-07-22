@@ -48,11 +48,22 @@ const StudyForm: React.FC<StudyFormProps> = ({
   const [newCategory, setNewCategory] = useState('');
   const [showAddCategory, setShowAddCategory] = useState(false);
 
+  const [maquinas, setMaquinas] = useState<string[]>(() => {
+    if (initialData?.maquinas) {
+      const cleanedExistingMaquinas = [...new Set(initialData.maquinas)];
+      return cleanedExistingMaquinas;
+    }
+    return [];
+  });
+  const [newMaquina, setNewMaquina] = useState('');
+  const [showAddMaquina, setShowAddMaquina] = useState(false);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const dataToSubmit = {
       ...formData,
-      categories: categories
+      categories: categories,
+      maquinas: maquinas
     };
     console.log('Sending study data:', dataToSubmit);
     onSubmit(dataToSubmit);
@@ -94,6 +105,20 @@ const StudyForm: React.FC<StudyFormProps> = ({
       return;
     }
     setCategories(prev => prev.filter(cat => cat !== categoryToRemove));
+  };
+
+  const handleAddMaquina = () => {
+    if (newMaquina.trim() && !maquinas.includes(newMaquina.trim().toLowerCase())) {
+      setMaquinas(prev => [...prev, newMaquina.trim().toLowerCase()]);
+      setNewMaquina('');
+      setShowAddMaquina(false);
+    } else if (maquinas.includes(newMaquina.trim().toLowerCase())) {
+      alert('Esta máquina ya existe');
+    }
+  };
+
+  const handleRemoveMaquina = (maquinaToRemove: string) => {
+    setMaquinas(prev => prev.filter(m => m !== maquinaToRemove));
   };
 
   return (
@@ -248,6 +273,36 @@ const StudyForm: React.FC<StudyFormProps> = ({
             );
           })}
         </div>
+      </div>
+
+      {/* Máquinas */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Máquinas</label>
+        <div className="flex flex-wrap gap-2 mb-2">
+          {maquinas.map((maquina) => (
+            <span key={maquina} className="inline-flex items-center px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
+              {maquina}
+              <button type="button" className="ml-1 text-red-500 hover:text-red-700" onClick={() => handleRemoveMaquina(maquina)}>
+                ×
+              </button>
+            </span>
+          ))}
+        </div>
+        {showAddMaquina ? (
+          <div className="flex gap-2 mb-2">
+            <input
+              type="text"
+              className="border rounded px-2 py-1 text-xs"
+              value={newMaquina}
+              onChange={e => setNewMaquina(e.target.value)}
+              placeholder="Nueva máquina"
+            />
+            <button type="button" className="bg-blue-500 text-white px-2 py-1 rounded text-xs" onClick={handleAddMaquina}>Agregar</button>
+            <button type="button" className="text-gray-500 px-2 py-1 text-xs" onClick={() => setShowAddMaquina(false)}>Cancelar</button>
+          </div>
+        ) : (
+          <button type="button" className="text-blue-600 text-xs underline" onClick={() => setShowAddMaquina(true)}>Agregar máquina</button>
+        )}
       </div>
 
       <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-4">
