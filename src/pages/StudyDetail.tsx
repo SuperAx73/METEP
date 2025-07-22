@@ -37,6 +37,10 @@ const StudyDetail: React.FC = () => {
   const [categories, setCategories] = useState<string[]>([]);
   const [newCategory, setNewCategory] = useState('');
   const [showAddCategory, setShowAddCategory] = useState(false);
+  const [newModalMaquina, setNewModalMaquina] = useState('');
+  const [addingModalMaquina, setAddingModalMaquina] = useState(false);
+  const [newModalCategoria, setNewModalCategoria] = useState('');
+  const [addingModalCategoria, setAddingModalCategoria] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -259,6 +263,49 @@ const StudyDetail: React.FC = () => {
   const handleRemoveCategory = (categoryToRemove: string) => {
     setCategories(prev => prev.filter(cat => cat !== categoryToRemove));
     toast.success('Categoría eliminada exitosamente');
+  };
+
+  // Handler para agregar máquina desde el modal
+  const handleAddModalMaquina = async () => {
+    if (!study || !newModalMaquina.trim()) return;
+    if (study.maquinas.includes(newModalMaquina.trim().toLowerCase())) {
+      toast.error('La máquina ya existe');
+      return;
+    }
+    setAddingModalMaquina(true);
+    try {
+      const nuevasMaquinas = [...study.maquinas, newModalMaquina.trim().toLowerCase()];
+      const updatedStudy = await updateStudy(study.id, { maquinas: nuevasMaquinas });
+      setStudy(prev => prev ? { ...prev, maquinas: nuevasMaquinas } : prev);
+      setRecordForm(prev => ({ ...prev, maquina: newModalMaquina.trim().toLowerCase() }));
+      toast.success('Máquina agregada');
+      setNewModalMaquina('');
+    } catch (error) {
+      toast.error('Error al agregar la máquina');
+    } finally {
+      setAddingModalMaquina(false);
+    }
+  };
+  // Handler para agregar categoría desde el modal
+  const handleAddModalCategoria = async () => {
+    if (!study || !newModalCategoria.trim()) return;
+    if (categories.includes(newModalCategoria.trim().toLowerCase())) {
+      toast.error('El modo de falla ya existe');
+      return;
+    }
+    setAddingModalCategoria(true);
+    try {
+      const nuevasCategorias = [...categories, newModalCategoria.trim().toLowerCase()];
+      const updatedStudy = await updateStudy(study.id, { categories: nuevasCategorias });
+      setCategories(nuevasCategorias);
+      setRecordForm(prev => ({ ...prev, categoriaCausa: newModalCategoria.trim().toLowerCase() }));
+      toast.success('Modo de falla agregado');
+      setNewModalCategoria('');
+    } catch (error) {
+      toast.error('Error al agregar el modo de falla');
+    } finally {
+      setAddingModalCategoria(false);
+    }
   };
 
   if (loading) {
@@ -593,26 +640,88 @@ const StudyDetail: React.FC = () => {
               Tiempo: {currentTime?.toFixed(1)}s (Umbral: {study?.taktime + study?.tolerancia}s)
             </p>
           </div>
-          
+
+          {/* Máquina primero */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Categoría de Causa *
+              Máquina *
             </label>
-            <select
-              value={recordForm.categoriaCausa}
-              onChange={(e) => setRecordForm(prev => ({ ...prev, categoriaCausa: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
-              required
-            >
-              <option value="">Selecciona una categoría</option>
-              {categories.map((category) => (
-                <option key={category} value={category}>
-                  {category}
-                </option>
-              ))}
-            </select>
+            <div className="flex gap-2">
+              <select
+                value={recordForm.maquina}
+                onChange={(e) => setRecordForm(prev => ({ ...prev, maquina: e.target.value }))}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                required
+              >
+                <option value="">Selecciona una máquina</option>
+                {study.maquinas && study.maquinas.length > 0 ? (
+                  study.maquinas.map((maquina: string) => (
+                    <option key={maquina} value={maquina}>{maquina}</option>
+                  ))
+                ) : (
+                  <option value="" disabled>No hay máquinas registradas</option>
+                )}
+              </select>
+              <button
+                type="button"
+                className="bg-blue-500 text-white px-2 py-1 rounded text-xs flex items-center"
+                onClick={handleAddModalMaquina}
+                disabled={addingModalMaquina || !newModalMaquina.trim()}
+                title="Agregar nueva máquina"
+              >
+                +
+              </button>
+            </div>
+            <input
+              type="text"
+              className="mt-2 w-full px-3 py-1 border border-gray-300 rounded-md text-xs"
+              placeholder="Nueva máquina..."
+              value={newModalMaquina}
+              onChange={e => setNewModalMaquina(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter') handleAddModalMaquina(); }}
+              disabled={addingModalMaquina}
+            />
           </div>
-          
+
+          {/* Modo de falla después */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Modo de Falla *
+            </label>
+            <div className="flex gap-2">
+              <select
+                value={recordForm.categoriaCausa}
+                onChange={(e) => setRecordForm(prev => ({ ...prev, categoriaCausa: e.target.value }))}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                required
+              >
+                <option value="">Selecciona un modo de falla</option>
+                {categories.map((category) => (
+                  <option key={category} value={category}>{category}</option>
+                ))}
+              </select>
+              <button
+                type="button"
+                className="bg-blue-500 text-white px-2 py-1 rounded text-xs flex items-center"
+                onClick={handleAddModalCategoria}
+                disabled={addingModalCategoria || !newModalCategoria.trim()}
+                title="Agregar nuevo modo de falla"
+              >
+                +
+              </button>
+            </div>
+            <input
+              type="text"
+              className="mt-2 w-full px-3 py-1 border border-gray-300 rounded-md text-xs"
+              placeholder="Nuevo modo de falla..."
+              value={newModalCategoria}
+              onChange={e => setNewModalCategoria(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter') handleAddModalCategoria(); }}
+              disabled={addingModalCategoria}
+            />
+          </div>
+
+          {/* Comentario al final */}
           <Input
             label="Comentario"
             value={recordForm.comentario}
@@ -620,27 +729,6 @@ const StudyDetail: React.FC = () => {
             placeholder="Describe la causa del microparo..."
           />
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Máquina *
-            </label>
-            <select
-              value={recordForm.maquina}
-              onChange={(e) => setRecordForm(prev => ({ ...prev, maquina: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
-              required
-            >
-              <option value="">Selecciona una máquina</option>
-              {study.maquinas && study.maquinas.length > 0 ? (
-                study.maquinas.map((maquina: string) => (
-                  <option key={maquina} value={maquina}>{maquina}</option>
-                ))
-              ) : (
-                <option value="" disabled>No hay máquinas registradas</option>
-              )}
-            </select>
-          </div>
-          
           <div className="flex space-x-3">
             <Button
               onClick={handleSaveMicroparo}
