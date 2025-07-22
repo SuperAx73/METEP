@@ -390,4 +390,10 @@ La aplicación está configurada para funcionar con Vercel:
 - Configurado para puerto 3001
 - Compatible con servicios como Railway, Render, etc.
 
+### actualizaciones
+## 📝 NOTA SOBRE 'MODO DE FALLA'
+
+En todas las tablas y reportes (Excel y la tabla de registros en la app) el título mostrado es 'Modo de Falla'. Sin embargo, para el manejo de datos y en el código, la variable utilizada sigue siendo 'categoriaCausa'. Este cambio es únicamente estético para mayor claridad en los reportes. 
+---
 Para deploys que requieren configuración de variables de entorno, asegúrate de agregar todas las variables VITE_* y las variables del backend en la configuración del servicio de deploy. 
+main
