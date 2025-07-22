@@ -33,15 +33,8 @@ const StudyDetail: React.FC = () => {
   const [showRecordForm, setShowRecordForm] = useState(false);
   const [microparoStartTime, setMicroparoStartTime] = useState<string | null>(null);
   const [taktimeCrossedTime, setTaktimeCrossedTime] = useState<string | null>(null);
-  const defaultCategories = [
-    'conveyor',
-    'falla de maquina',
-    'falta de alimentacion',
-    'flujo lento',
-    'linea llena'
-  ];
-
-  const [categories, setCategories] = useState<string[]>(defaultCategories);
+  // Eliminar defaultCategories y toda lógica relacionada
+  const [categories, setCategories] = useState<string[]>([]);
   const [newCategory, setNewCategory] = useState('');
   const [showAddCategory, setShowAddCategory] = useState(false);
 
@@ -54,13 +47,9 @@ const StudyDetail: React.FC = () => {
   // Update categories when study data changes
   useEffect(() => {
     if (study?.categories) {
-      // Clean existing categories first (remove duplicates)
-      const cleanedStudyCategories = [...new Set(study.categories)];
-      // Combine default categories with study categories, ensuring no duplicates
-      const combined = [...defaultCategories, ...cleanedStudyCategories];
-      setCategories([...new Set(combined)]);
+      setCategories([...new Set(study.categories)]);
     } else {
-      setCategories(defaultCategories);
+      setCategories([]);
     }
   }, [study?.categories]);
 
@@ -268,10 +257,6 @@ const StudyDetail: React.FC = () => {
   };
 
   const handleRemoveCategory = (categoryToRemove: string) => {
-    if (defaultCategories.includes(categoryToRemove)) {
-      toast.error('No puedes eliminar las categorías predeterminadas');
-      return;
-    }
     setCategories(prev => prev.filter(cat => cat !== categoryToRemove));
     toast.success('Categoría eliminada exitosamente');
   };
@@ -568,30 +553,20 @@ const StudyDetail: React.FC = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
                 {categories.map((category) => {
-                  const isDefault = defaultCategories.includes(category);
                   return (
                     <div
                       key={category}
-                      className={`flex items-center justify-between p-3 rounded-lg border ${
-                        isDefault ? 'bg-blue-50 border-blue-200' : 'bg-gray-50 border-gray-200'
-                      }`}
+                      className="flex items-center justify-between p-3 rounded-lg border bg-gray-50 border-gray-200"
                     >
-                      <span className={`text-sm font-medium ${
-                        isDefault ? 'text-blue-700' : 'text-gray-700'
-                      }`}>
+                      <span className="text-sm font-medium text-gray-700">
                         {category}
-                        {isDefault && (
-                          <span className="ml-2 text-xs text-blue-500">(predeterminada)</span>
-                        )}
                       </span>
-                      {!isDefault && (
-                        <button
-                          onClick={() => handleRemoveCategory(category)}
-                          className="text-red-500 hover:text-red-700 text-sm"
-                        >
-                          ×
-                        </button>
-                      )}
+                      <button
+                        onClick={() => handleRemoveCategory(category)}
+                        className="text-red-500 hover:text-red-700 text-sm"
+                      >
+                        ×
+                      </button>
                     </div>
                   );
                 })}

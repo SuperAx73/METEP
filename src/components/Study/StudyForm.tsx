@@ -27,23 +27,11 @@ const StudyForm: React.FC<StudyFormProps> = ({
     tolerancia: initialData?.tolerancia || 5
   });
 
-  const defaultCategories = [
-    'conveyor',
-    'falla de maquina',
-    'falta de alimentacion',
-    'flujo lento',
-    'linea llena'
-  ];
-
   const [categories, setCategories] = useState<string[]>(() => {
     if (initialData?.categories) {
-      // Clean existing categories first (remove duplicates)
-      const cleanedExistingCategories = [...new Set(initialData.categories)];
-      // Combine default categories with existing ones, ensuring no duplicates
-      const combined = [...defaultCategories, ...cleanedExistingCategories];
-      return [...new Set(combined)]; // Remove duplicates
+      return [...new Set(initialData.categories)];
     }
-    return defaultCategories;
+    return [];
   });
   const [newCategory, setNewCategory] = useState('');
   const [showAddCategory, setShowAddCategory] = useState(false);
@@ -100,10 +88,6 @@ const StudyForm: React.FC<StudyFormProps> = ({
   };
 
   const handleRemoveCategory = (categoryToRemove: string) => {
-    if (defaultCategories.includes(categoryToRemove)) {
-      alert('No puedes eliminar las categorías predeterminadas');
-      return;
-    }
     setCategories(prev => prev.filter(cat => cat !== categoryToRemove));
   };
 
@@ -244,31 +228,21 @@ const StudyForm: React.FC<StudyFormProps> = ({
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
           {categories.map((category) => {
-            const isDefault = defaultCategories.includes(category);
             return (
               <div
                 key={category}
-                className={`flex items-center justify-between p-3 rounded-lg border ${
-                  isDefault ? 'bg-blue-50 border-blue-200' : 'bg-gray-50 border-gray-200'
-                }`}
+                className={`flex items-center justify-between p-3 rounded-lg border bg-gray-50 border-gray-200`}
               >
-                <span className={`text-sm font-medium ${
-                  isDefault ? 'text-blue-700' : 'text-gray-700'
-                }`}>
+                <span className={`text-sm font-medium text-gray-700`}>
                   {category}
-                  {isDefault && (
-                    <span className="ml-2 text-xs text-blue-500">(predeterminada)</span>
-                  )}
                 </span>
-                {!isDefault && (
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveCategory(category)}
-                    className="text-red-500 hover:text-red-700 text-sm"
-                  >
-                    ×
-                  </button>
-                )}
+                <button
+                  type="button"
+                  onClick={() => handleRemoveCategory(category)}
+                  className="text-red-500 hover:text-red-700 text-sm"
+                >
+                  ×
+                </button>
               </div>
             );
           })}
@@ -276,33 +250,51 @@ const StudyForm: React.FC<StudyFormProps> = ({
       </div>
 
       {/* Máquinas */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Máquinas</label>
-        <div className="flex flex-wrap gap-2 mb-2">
-          {maquinas.map((maquina) => (
-            <span key={maquina} className="inline-flex items-center px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
-              {maquina}
-              <button type="button" className="ml-1 text-red-500 hover:text-red-700" onClick={() => handleRemoveMaquina(maquina)}>
-                ×
-              </button>
-            </span>
-          ))}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <label className="block text-sm font-medium text-gray-700 mb-1">Máquinas</label>
+          <button
+            type="button"
+            className="text-blue-600 text-xs underline"
+            onClick={() => setShowAddMaquina(!showAddMaquina)}
+          >
+            {showAddMaquina ? 'Cancelar' : 'Agregar Máquina'}
+          </button>
         </div>
-        {showAddMaquina ? (
-          <div className="flex gap-2 mb-2">
-            <input
-              type="text"
-              className="border rounded px-2 py-1 text-xs"
+        {showAddMaquina && (
+          <div className="flex items-center space-x-2 p-4 bg-blue-50 rounded-lg">
+            <Input
+              placeholder="Nueva máquina..."
               value={newMaquina}
               onChange={e => setNewMaquina(e.target.value)}
-              placeholder="Nueva máquina"
+              className="flex-1"
             />
-            <button type="button" className="bg-blue-500 text-white px-2 py-1 rounded text-xs" onClick={handleAddMaquina}>Agregar</button>
-            <button type="button" className="text-gray-500 px-2 py-1 text-xs" onClick={() => setShowAddMaquina(false)}>Cancelar</button>
+            <Button
+              size="sm"
+              onClick={handleAddMaquina}
+              disabled={!newMaquina.trim()}
+            >
+              Agregar
+            </Button>
           </div>
-        ) : (
-          <button type="button" className="text-blue-600 text-xs underline" onClick={() => setShowAddMaquina(true)}>Agregar máquina</button>
         )}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+          {maquinas.map((maquina) => (
+            <div
+              key={maquina}
+              className="flex items-center justify-between p-3 rounded-lg border bg-blue-50 border-blue-200"
+            >
+              <span className="text-sm font-medium text-blue-700">{maquina}</span>
+              <button
+                type="button"
+                className="text-red-500 hover:text-red-700 text-sm"
+                onClick={() => handleRemoveMaquina(maquina)}
+              >
+                ×
+              </button>
+            </div>
+          ))}
+        </div>
       </div>
 
       <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-4">
