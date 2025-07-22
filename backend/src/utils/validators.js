@@ -35,7 +35,8 @@ export const recordValidationSchema = Joi.object({
   hora: Joi.string().required(),
   horaInicioMicroparo: Joi.string().optional().allow(''),
   categoriaCausa: Joi.string().allow('').max(100),
-  comentario: Joi.string().allow('').max(500)
+  comentario: Joi.string().allow('').max(500),
+  maquina: Joi.string().allow('').max(100)
 });
 
 export const userValidationSchema = Joi.object({
