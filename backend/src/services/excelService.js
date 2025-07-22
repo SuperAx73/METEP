@@ -28,7 +28,7 @@ export class ExcelService {
 
       // Hoja 2: Todos los Registros
       const todosSheet = workbook.addWorksheet('Todos los Registros');
-      todosSheet.addRow(['N° Muestra', 'Es Microparo', 'Tiempo Ciclo', 'Desviación', 'Fecha', 'Hora', 'Hora Inicio Microparo', 'Categoría', 'Comentario']);
+      todosSheet.addRow(['N° Muestra', 'Es Microparo', 'Tiempo Ciclo', 'Desviación', 'Fecha', 'Hora Inicio Microparo', 'Hora', 'Máquina', 'Categoría', 'Comentario']);
       
       study.records.forEach(record => {
         todosSheet.addRow([
@@ -37,8 +37,9 @@ export class ExcelService {
           record.tiempoCiclo,
           record.desviacion,
           record.fecha,
-          record.hora,
           record.horaInicioMicroparo || '',
+          record.hora,
+          record.maquina || '',
           record.categoriaCausa || '',
           record.comentario || ''
         ]);
@@ -46,7 +47,7 @@ export class ExcelService {
 
       // Hoja 3: Solo Microparos
       const microparosSheet = workbook.addWorksheet('Solo Microparos');
-      microparosSheet.addRow(['N° Muestra', 'Tiempo Ciclo', 'Desviación', 'Fecha', 'Hora', 'Hora Inicio Microparo', 'Categoría', 'Comentario']);
+      microparosSheet.addRow(['N° Muestra', 'Tiempo Ciclo', 'Desviación', 'Fecha', 'Hora Inicio Microparo', 'Hora', 'Máquina', 'Categoría', 'Comentario']);
       
       study.records.filter(r => r.esMicroparo).forEach(record => {
         microparosSheet.addRow([
@@ -54,8 +55,9 @@ export class ExcelService {
           record.tiempoCiclo,
           record.desviacion,
           record.fecha,
-          record.hora,
           record.horaInicioMicroparo || '',
+          record.hora,
+          record.maquina || '',
           record.categoriaCausa || '',
           record.comentario || ''
         ]);

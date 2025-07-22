@@ -16,6 +16,7 @@ export interface Study {
   taktime: number;
   tolerancia: number;
   categories: string[];
+  maquinas: string[];
   createdAt: Date;
   updatedAt: Date;
   records: Record[];
@@ -30,6 +31,7 @@ export interface Record {
   fecha: string;
   hora: string;
   categoriaCausa: string;
+  maquina?: string;
   comentario: string;
   timestamp: Date;
 }

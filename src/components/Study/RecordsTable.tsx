@@ -33,10 +33,13 @@ const RecordsTable: React.FC<RecordsTableProps> = ({ records }) => {
                 Fecha
               </th>
               <th className="px-2 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Hora Inicio Microparo
+              </th>
+              <th className="px-2 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Hora
               </th>
               <th className="px-2 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Hora Inicio Microparo
+                Máquina
               </th>
               <th className="px-2 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Categoría
@@ -86,10 +89,13 @@ const RecordsTable: React.FC<RecordsTableProps> = ({ records }) => {
                     {record.fecha}
                   </td>
                   <td className="px-2 sm:px-6 py-2 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500">
+                    {record.horaInicioMicroparo || ''}
+                  </td>
+                  <td className="px-2 sm:px-6 py-2 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500">
                     {record.hora}
                   </td>
                   <td className="px-2 sm:px-6 py-2 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500">
-                    {record.horaInicioMicroparo || ''}
+                    {record.esMicroparo ? (record.maquina || '-') : ''}
                   </td>
                   <td className="px-2 sm:px-6 py-2 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500">
                     {record.categoriaCausa || '-'}

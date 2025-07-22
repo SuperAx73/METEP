@@ -24,7 +24,8 @@ const StudyDetail: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'capture' | 'data'>('capture');
   const [recordForm, setRecordForm] = useState({
     categoriaCausa: '',
-    comentario: ''
+    comentario: '',
+    maquina: ''
   });
   const [isEditing, setIsEditing] = useState(false);
   const [editLoading, setEditLoading] = useState(false);
@@ -32,15 +33,8 @@ const StudyDetail: React.FC = () => {
   const [showRecordForm, setShowRecordForm] = useState(false);
   const [microparoStartTime, setMicroparoStartTime] = useState<string | null>(null);
   const [taktimeCrossedTime, setTaktimeCrossedTime] = useState<string | null>(null);
-  const defaultCategories = [
-    'conveyor',
-    'falla de maquina',
-    'falta de alimentacion',
-    'flujo lento',
-    'linea llena'
-  ];
-
-  const [categories, setCategories] = useState<string[]>(defaultCategories);
+  // Eliminar defaultCategories y toda lógica relacionada
+  const [categories, setCategories] = useState<string[]>([]);
   const [newCategory, setNewCategory] = useState('');
   const [showAddCategory, setShowAddCategory] = useState(false);
 
@@ -53,13 +47,9 @@ const StudyDetail: React.FC = () => {
   // Update categories when study data changes
   useEffect(() => {
     if (study?.categories) {
-      // Clean existing categories first (remove duplicates)
-      const cleanedStudyCategories = [...new Set(study.categories)];
-      // Combine default categories with study categories, ensuring no duplicates
-      const combined = [...defaultCategories, ...cleanedStudyCategories];
-      setCategories([...new Set(combined)]);
+      setCategories([...new Set(study.categories)]);
     } else {
-      setCategories(defaultCategories);
+      setCategories([]);
     }
   }, [study?.categories]);
 
@@ -219,6 +209,7 @@ const StudyDetail: React.FC = () => {
         horaInicioMicroparo,
         categoriaCausa: recordForm.categoriaCausa,
         comentario: recordForm.comentario,
+        maquina: recordForm.maquina,
         numeroMuestra: study.records.length + 1
       };
 
@@ -234,7 +225,7 @@ const StudyDetail: React.FC = () => {
       });
       
       // Clear form and hide
-      setRecordForm({ categoriaCausa: '', comentario: '' });
+      setRecordForm({ categoriaCausa: '', comentario: '', maquina: '' });
       setShowRecordForm(false);
       setCurrentTime(null);
       setMicroparoStartTime(null);
@@ -249,7 +240,7 @@ const StudyDetail: React.FC = () => {
   const handleCancelMicroparo = () => {
     setShowRecordForm(false);
     setCurrentTime(null);
-    setRecordForm({ categoriaCausa: '', comentario: '' });
+    setRecordForm({ categoriaCausa: '', comentario: '', maquina: '' });
     setMicroparoStartTime(null);
     setTaktimeCrossedTime(null);
   };
@@ -266,10 +257,6 @@ const StudyDetail: React.FC = () => {
   };
 
   const handleRemoveCategory = (categoryToRemove: string) => {
-    if (defaultCategories.includes(categoryToRemove)) {
-      toast.error('No puedes eliminar las categorías predeterminadas');
-      return;
-    }
     setCategories(prev => prev.filter(cat => cat !== categoryToRemove));
     toast.success('Categoría eliminada exitosamente');
   };
@@ -566,30 +553,20 @@ const StudyDetail: React.FC = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
                 {categories.map((category) => {
-                  const isDefault = defaultCategories.includes(category);
                   return (
                     <div
                       key={category}
-                      className={`flex items-center justify-between p-3 rounded-lg border ${
-                        isDefault ? 'bg-blue-50 border-blue-200' : 'bg-gray-50 border-gray-200'
-                      }`}
+                      className="flex items-center justify-between p-3 rounded-lg border bg-gray-50 border-gray-200"
                     >
-                      <span className={`text-sm font-medium ${
-                        isDefault ? 'text-blue-700' : 'text-gray-700'
-                      }`}>
+                      <span className="text-sm font-medium text-gray-700">
                         {category}
-                        {isDefault && (
-                          <span className="ml-2 text-xs text-blue-500">(predeterminada)</span>
-                        )}
                       </span>
-                      {!isDefault && (
-                        <button
-                          onClick={() => handleRemoveCategory(category)}
-                          className="text-red-500 hover:text-red-700 text-sm"
-                        >
-                          ×
-                        </button>
-                      )}
+                      <button
+                        onClick={() => handleRemoveCategory(category)}
+                        className="text-red-500 hover:text-red-700 text-sm"
+                      >
+                        ×
+                      </button>
                     </div>
                   );
                 })}
@@ -642,11 +619,32 @@ const StudyDetail: React.FC = () => {
             onChange={(e) => setRecordForm(prev => ({ ...prev, comentario: e.target.value }))}
             placeholder="Describe la causa del microparo..."
           />
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Máquina *
+            </label>
+            <select
+              value={recordForm.maquina}
+              onChange={(e) => setRecordForm(prev => ({ ...prev, maquina: e.target.value }))}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
+              required
+            >
+              <option value="">Selecciona una máquina</option>
+              {study.maquinas && study.maquinas.length > 0 ? (
+                study.maquinas.map((maquina: string) => (
+                  <option key={maquina} value={maquina}>{maquina}</option>
+                ))
+              ) : (
+                <option value="" disabled>No hay máquinas registradas</option>
+              )}
+            </select>
+          </div>
           
           <div className="flex space-x-3">
             <Button
               onClick={handleSaveMicroparo}
-              disabled={!recordForm.categoriaCausa}
+              disabled={!recordForm.categoriaCausa || !recordForm.maquina}
               className="flex-1 bg-red-600 hover:bg-red-700 focus:ring-red-500"
             >
               Guardar Microparo

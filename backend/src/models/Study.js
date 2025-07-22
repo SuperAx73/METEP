@@ -15,6 +15,7 @@ export class Study {
     this.taktime = data.taktime;
     this.tolerancia = data.tolerancia;
     this.categories = data.categories || [];
+    this.maquinas = data.maquinas || [];
     // Conversión robusta de fechas:
     this.createdAt = data.createdAt && typeof data.createdAt.toDate === 'function'
       ? data.createdAt.toDate()

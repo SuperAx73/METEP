@@ -9,7 +9,8 @@ export const studyValidationSchema = Joi.object({
   piezasPorHora: Joi.number().required().min(1).max(10000),
   taktime: Joi.number().required().min(0.1).max(3600),
   tolerancia: Joi.number().required().min(0.01).max(60),
-  categories: Joi.array().items(Joi.string()).optional().default([])
+  categories: Joi.array().items(Joi.string()).optional().default([]),
+  maquinas: Joi.array().items(Joi.string()).optional().default([])
 });
 
 export const studyUpdateValidationSchema = Joi.object({
@@ -21,7 +22,8 @@ export const studyUpdateValidationSchema = Joi.object({
   piezasPorHora: Joi.number().optional().min(1).max(10000),
   taktime: Joi.number().optional().min(0.1).max(3600),
   tolerancia: Joi.number().optional().min(0.01).max(60),
-  categories: Joi.array().items(Joi.string()).optional().default([])
+  categories: Joi.array().items(Joi.string()).optional().default([]),
+  maquinas: Joi.array().items(Joi.string()).optional().default([])
 });
 
 export const recordValidationSchema = Joi.object({
@@ -33,7 +35,8 @@ export const recordValidationSchema = Joi.object({
   hora: Joi.string().required(),
   horaInicioMicroparo: Joi.string().optional().allow(''),
   categoriaCausa: Joi.string().allow('').max(100),
-  comentario: Joi.string().allow('').max(500)
+  comentario: Joi.string().allow('').max(500),
+  maquina: Joi.string().allow('').max(100)
 });
 
 export const userValidationSchema = Joi.object({
