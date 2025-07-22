@@ -6,6 +6,7 @@ export class ExcelService {
     try {
       const workbook = new ExcelJS.Workbook();
       const analytics = study.getAnalytics();
+      const microparos = study.records.filter(r => r.esMicroparo);
 
       // Hoja 1: Resumen del Estudio
       const resumenSheet = workbook.addWorksheet('Resumen del Estudio');
