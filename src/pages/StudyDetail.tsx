@@ -11,6 +11,7 @@ import Card from '../components/UI/Card';
 import LoadingSpinner from '../components/UI/LoadingSpinner';
 import Input from '../components/UI/Input';
 import Modal from '../components/UI/Modal';
+import { getCurrentDateForBackend, getCurrentTimeForUI } from '../utils/dateUtils';
 import toast from 'react-hot-toast';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
@@ -82,7 +83,7 @@ const StudyDetail: React.FC = () => {
     // Si es un microparo, usar la hora en la que se cruzó el taktime
     if (isMicroparo) {
       setCurrentTime(time);
-      setMicroparoStartTime(taktimeCrossedTime || new Date().toLocaleTimeString());
+      setMicroparoStartTime(taktimeCrossedTime || getCurrentTimeForUI());
       setShowRecordForm(true);
       return;
     }
@@ -94,8 +95,8 @@ const StudyDetail: React.FC = () => {
         tiempoCiclo: time,
         desviacion: time - study.taktime,
         esMicroparo: false,
-        fecha: now.toLocaleDateString(),
-        hora: now.toLocaleTimeString(),
+        fecha: getCurrentDateForBackend(),
+        hora: getCurrentTimeForUI(),
         categoriaCausa: '',
         comentario: '',
         numeroMuestra: study.records.length + 1
@@ -208,8 +209,8 @@ const StudyDetail: React.FC = () => {
         tiempoCiclo: currentTime,
         desviacion,
         esMicroparo: true,
-        fecha: now.toLocaleDateString(),
-        hora: horaFin.toLocaleTimeString(),
+        fecha: getCurrentDateForBackend(),
+        hora: getCurrentTimeForUI(),
         horaInicioMicroparo,
         categoriaCausa: recordForm.categoriaCausa,
         comentario: recordForm.comentario,
