@@ -1,18 +1,21 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useCallback } from 'react';
 import { Play, Pause, RotateCcw } from 'lucide-react';
 import { useStopwatch } from '../../hooks/useStopwatch';
+import { useSafariDetection } from '../../hooks/useSafariDetection';
 import Button from '../UI/Button';
 
 interface StopwatchProps {
-  onRecordTime: (time: number) => void;
+  onRecordTime: (time: number) => Promise<void>;
   taktime: number;
   onTaktimeReached?: (hora: string) => void;
 }
 
 const Stopwatch: React.FC<StopwatchProps> = ({ onRecordTime, taktime, onTaktimeReached }) => {
   const { formattedTime, isRunning, start, pause, reset, getCurrentTime } = useStopwatch();
+  const { isSafariMobile } = useSafariDetection();
   const prevTimeRef = useRef<number>(0);
   const taktimeReachedRef = useRef<boolean>(false);
+  const isProcessingRef = useRef<boolean>(false);
 
   useEffect(() => {
     if (!isRunning) {
@@ -20,6 +23,7 @@ const Stopwatch: React.FC<StopwatchProps> = ({ onRecordTime, taktime, onTaktimeR
       prevTimeRef.current = 0;
       return;
     }
+    
     const interval = setInterval(() => {
       const currentTime = getCurrentTime();
       if (!taktimeReachedRef.current && prevTimeRef.current < taktime && currentTime >= taktime) {
@@ -30,17 +34,60 @@ const Stopwatch: React.FC<StopwatchProps> = ({ onRecordTime, taktime, onTaktimeR
       }
       prevTimeRef.current = currentTime;
     }, 50);
+    
     return () => clearInterval(interval);
   }, [isRunning, taktime, getCurrentTime, onTaktimeReached]);
 
-  const handlePieceReady = () => {
-    if (isRunning) {
-      const currentTime = getCurrentTime();
-      onRecordTime(currentTime);
-      reset();
-      start(); // Restart for next piece
+  const handlePieceReady = useCallback(async () => {
+    // Prevent multiple rapid clicks
+    if (isProcessingRef.current || !isRunning) {
+      console.log('Piece ready blocked: processing=', isProcessingRef.current, 'running=', isRunning);
+      return;
     }
-  };
+
+    try {
+      isProcessingRef.current = true;
+      const currentTime = getCurrentTime();
+      
+      console.log('Piece ready clicked - time:', currentTime, 'isRunning:', isRunning, 'isSafariMobile:', isSafariMobile);
+      
+      // Ensure we have a valid time
+      if (currentTime <= 0) {
+        console.warn('Invalid time detected:', currentTime);
+        return;
+      }
+
+      // Call the record function
+      await onRecordTime(currentTime);
+      
+      // Reset and restart for next piece
+      reset();
+      start();
+      
+      console.log('Piece ready completed successfully');
+    } catch (error) {
+      console.error('Error in handlePieceReady:', error);
+    } finally {
+      // Small delay to prevent rapid successive clicks
+      // Longer delay for Safari mobile to prevent issues
+      const delay = isSafariMobile ? 200 : 100;
+      setTimeout(() => {
+        isProcessingRef.current = false;
+      }, delay);
+    }
+  }, [isRunning, getCurrentTime, onRecordTime, reset, start, isSafariMobile]);
+
+  const handleStartPause = useCallback(() => {
+    if (isRunning) {
+      pause();
+    } else {
+      start();
+    }
+  }, [isRunning, start, pause]);
+
+  const handleReset = useCallback(() => {
+    reset();
+  }, [reset]);
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
@@ -63,7 +110,7 @@ const Stopwatch: React.FC<StopwatchProps> = ({ onRecordTime, taktime, onTaktimeR
           <Button
             variant="secondary"
             size="lg"
-            onClick={isRunning ? pause : start}
+            onClick={handleStartPause}
             className="w-full sm:w-auto"
           >
             {isRunning ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
@@ -73,7 +120,7 @@ const Stopwatch: React.FC<StopwatchProps> = ({ onRecordTime, taktime, onTaktimeR
           <Button
             variant="outline"
             size="lg"
-            onClick={reset}
+            onClick={handleReset}
             className="w-full sm:w-auto"
           >
             <RotateCcw className="h-5 w-5 mr-2" />

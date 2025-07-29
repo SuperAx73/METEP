@@ -1,4 +1,4 @@
-import React, { ButtonHTMLAttributes } from 'react';
+import React, { ButtonHTMLAttributes, useRef, useEffect } from 'react';
 import { Loader2 } from 'lucide-react';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -15,9 +15,47 @@ const Button: React.FC<ButtonProps> = ({
   children,
   className = '',
   disabled,
+  onClick,
   ...props 
 }) => {
-  const baseClasses = 'inline-flex items-center justify-center font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2';
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const touchStartTimeRef = useRef<number>(0);
+  const touchEndTimeRef = useRef<number>(0);
+
+  useEffect(() => {
+    const button = buttonRef.current;
+    if (!button || !onClick) return;
+
+    // Safari-specific touch handling
+    const handleTouchStart = (e: TouchEvent) => {
+      touchStartTimeRef.current = Date.now();
+      // Prevent default to avoid double-firing on some Safari versions
+      e.preventDefault();
+    };
+
+    const handleTouchEnd = (e: TouchEvent) => {
+      touchEndTimeRef.current = Date.now();
+      const touchDuration = touchEndTimeRef.current - touchStartTimeRef.current;
+      
+      // Only trigger if it's a quick tap (less than 500ms) and not a scroll
+      if (touchDuration < 500) {
+        e.preventDefault();
+        e.stopPropagation();
+        onClick(e as any);
+      }
+    };
+
+    // Add touch event listeners for Safari compatibility
+    button.addEventListener('touchstart', handleTouchStart, { passive: false });
+    button.addEventListener('touchend', handleTouchEnd, { passive: false });
+
+    return () => {
+      button.removeEventListener('touchstart', handleTouchStart);
+      button.removeEventListener('touchend', handleTouchEnd);
+    };
+  }, [onClick]);
+
+  const baseClasses = 'inline-flex items-center justify-center font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 touch-target safari-button';
   
   const variantClasses = {
     primary: 'bg-blue-600 hover:bg-blue-700 text-white focus:ring-blue-500',
@@ -36,8 +74,10 @@ const Button: React.FC<ButtonProps> = ({
 
   return (
     <button
+      ref={buttonRef}
       className={`${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''} ${className}`}
       disabled={isDisabled}
+      onClick={onClick}
       {...props}
     >
       {loading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
