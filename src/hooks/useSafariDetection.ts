@@ -6,16 +6,42 @@ export const useSafariDetection = () => {
 
   useEffect(() => {
     const detectSafari = () => {
-      const userAgent = navigator.userAgent;
-      const isSafariBrowser = /Safari/.test(userAgent) && !/Chrome/.test(userAgent);
-      const isMobileDevice = /iPhone|iPad|iPod|Android/i.test(userAgent);
-      
-      setIsSafari(isSafariBrowser);
-      setIsMobile(isMobileDevice);
+      try {
+        const userAgent = navigator.userAgent;
+        
+        // More robust Safari detection
+        const isSafariBrowser = /Safari/.test(userAgent) && 
+                               !/Chrome/.test(userAgent) && 
+                               !/Chromium/.test(userAgent) &&
+                               !/Edg/.test(userAgent);
+        
+        // Mobile device detection
+        const isMobileDevice = /iPhone|iPad|iPod|Android|BlackBerry|IEMobile|Opera Mini/i.test(userAgent) ||
+                              (navigator.maxTouchPoints && navigator.maxTouchPoints > 0);
+        
+        setIsSafari(isSafariBrowser);
+        setIsMobile(isMobileDevice);
+        
+        console.log('Browser detection:', {
+          userAgent,
+          isSafari: isSafariBrowser,
+          isMobile: isMobileDevice,
+          maxTouchPoints: navigator.maxTouchPoints
+        });
+      } catch (error) {
+        console.warn('Error detecting browser:', error);
+        // Fallback to false if detection fails
+        setIsSafari(false);
+        setIsMobile(false);
+      }
     };
 
     detectSafari();
   }, []);
 
-  return { isSafari, isMobile, isSafariMobile: isSafari && isMobile };
+  return { 
+    isSafari, 
+    isMobile, 
+    isSafariMobile: isSafari && isMobile 
+  };
 }; 

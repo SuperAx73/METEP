@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useCallback } from 'react';
 import { Play, Pause, RotateCcw } from 'lucide-react';
 import { useStopwatch } from '../../hooks/useStopwatch';
 import { useSafariDetection } from '../../hooks/useSafariDetection';
+import { useSafariClick } from '../../hooks/useSafariClick';
 import Button from '../UI/Button';
 
 interface StopwatchProps {
@@ -15,7 +16,6 @@ const Stopwatch: React.FC<StopwatchProps> = ({ onRecordTime, taktime, onTaktimeR
   const { isSafariMobile } = useSafariDetection();
   const prevTimeRef = useRef<number>(0);
   const taktimeReachedRef = useRef<boolean>(false);
-  const isProcessingRef = useRef<boolean>(false);
 
   useEffect(() => {
     if (!isRunning) {
@@ -38,44 +38,35 @@ const Stopwatch: React.FC<StopwatchProps> = ({ onRecordTime, taktime, onTaktimeR
     return () => clearInterval(interval);
   }, [isRunning, taktime, getCurrentTime, onTaktimeReached]);
 
-  const handlePieceReady = useCallback(async () => {
-    // Prevent multiple rapid clicks
-    if (isProcessingRef.current || !isRunning) {
-      console.log('Piece ready blocked: processing=', isProcessingRef.current, 'running=', isRunning);
+  const handlePieceReadyLogic = useCallback(async () => {
+    if (!isRunning) {
+      console.log('Piece ready blocked: not running');
       return;
     }
 
-    try {
-      isProcessingRef.current = true;
-      const currentTime = getCurrentTime();
-      
-      console.log('Piece ready clicked - time:', currentTime, 'isRunning:', isRunning, 'isSafariMobile:', isSafariMobile);
-      
-      // Ensure we have a valid time
-      if (currentTime <= 0) {
-        console.warn('Invalid time detected:', currentTime);
-        return;
-      }
-
-      // Call the record function
-      await onRecordTime(currentTime);
-      
-      // Reset and restart for next piece
-      reset();
-      start();
-      
-      console.log('Piece ready completed successfully');
-    } catch (error) {
-      console.error('Error in handlePieceReady:', error);
-    } finally {
-      // Small delay to prevent rapid successive clicks
-      // Longer delay for Safari mobile to prevent issues
-      const delay = isSafariMobile ? 200 : 100;
-      setTimeout(() => {
-        isProcessingRef.current = false;
-      }, delay);
+    const currentTime = getCurrentTime();
+    
+    console.log('Piece ready clicked - time:', currentTime, 'isRunning:', isRunning, 'isSafariMobile:', isSafariMobile);
+    
+    // Ensure we have a valid time
+    if (currentTime <= 0) {
+      console.warn('Invalid time detected:', currentTime);
+      return;
     }
+
+    // Call the record function
+    await onRecordTime(currentTime);
+    
+    // Reset and restart for next piece
+    reset();
+    start();
+    
+    console.log('Piece ready completed successfully');
   }, [isRunning, getCurrentTime, onRecordTime, reset, start, isSafariMobile]);
+
+  // Use the Safari-specific click handler with appropriate delay
+  const delay = isSafariMobile ? 400 : 300;
+  const handlePieceReady = useSafariClick(handlePieceReadyLogic, delay);
 
   const handleStartPause = useCallback(() => {
     if (isRunning) {
