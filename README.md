@@ -1,10 +1,26 @@
-# MTEP - Análisis de Microparos en Procesos Industriales
+# METEP - Análisis de Microparos en Procesos Industriales
 
-## 🎯 DESCRIPCIÓN DEL PROYECTO
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Node.js](https://img.shields.io/badge/Node.js-18.x-green.svg)](https://nodejs.org/)
+[![React](https://img.shields.io/badge/React-18.3.1-blue.svg)](https://reactjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.5.3-blue.svg)](https://www.typescriptlang.org/)
+[![Vite](https://img.shields.io/badge/Vite-7.0.5-purple.svg)](https://vitejs.dev/)
+[![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.4.1-38B2AC.svg)](https://tailwindcss.com/)
+[![Firebase](https://img.shields.io/badge/Firebase-11.10.0-orange.svg)](https://firebase.google.com/)
 
-MTEP es una herramienta web diseñada para medir la frecuencia con la que sale cada pieza en líneas de producción industrial, detectando y categorizando microparos para análisis posterior. La aplicación permite realizar estudios detallados de eficiencia y generar reportes completos en formato Excel.
+## Estado del Proyecto
 
-## 🏗️ ARQUITECTURA DEL PROYECTO
+- **Desarrollo**: Completado
+- **Testing**: Funcional
+- **Deploy**: Activo en Vercel
+- **Documentación**: Completa
+- **Mantenimiento**: Activo
+
+## Descripción del Proyecto
+
+METEP es una aplicación web para medir la frecuencia de salida de piezas en líneas de producción industrial, detectando y categorizando microparos para análisis posterior. Permite realizar estudios de eficiencia y generar reportes en Excel.
+
+## Arquitectura del Proyecto
 
 ### Estructura de Carpetas
 ```
@@ -46,7 +62,7 @@ METEP/
 - **Persistencia**: Firebase Firestore
 - **Autenticación**: Firebase Auth + JWT
 
-## 📱 FUNCIONALIDADES PRINCIPALES
+## Funcionalidades Principales
 
 ### 1. Sistema de Autenticación
 - Login/Registro con correo electrónico
@@ -73,7 +89,7 @@ METEP/
 - Generación de reportes Pareto
 - Cálculo de eficiencia
 
-## 🛠️ TECNOLOGÍAS UTILIZADAS
+## Tecnologías Utilizadas
 
 ### Frontend
 - **React 18+** con TypeScript
@@ -103,7 +119,7 @@ METEP/
 - **Vercel** para frontend y API routes
 - **Vercel Functions** para backend serverless
 
-## 📊 ESTRUCTURA DE PANTALLAS
+## Estructura de Pantallas
 
 ### Pantalla 1: Login/Registro
 - Formulario de autenticación
@@ -142,7 +158,7 @@ METEP/
 - Taktime en segundos
 - Tolerancia en segundos
 
-## 📈 EXPORTACIÓN A EXCEL
+## Exportación a Excel
 
 ### Hoja 1: Resumen del Estudio
 - Datos completos del estudio
@@ -165,7 +181,7 @@ METEP/
 - Campos: desviación, categoría de causa
 - Gráfico de Pareto incluido
 
-## 🔧 LÓGICA DE NEGOCIO CRÍTICA
+## Lógica de Negocio Crítica
 
 ### Detección de Microparos
 ```javascript
@@ -192,9 +208,9 @@ const calcularEficiencia = (taktime, piezasMedidas, tiempoTotal) => {
 4. **Cronómetro**: Precisión de centésimas de segundo
 5. **Registros**: Automáticos al presionar "Pieza Lista"
 
-## 🚫 RESTRICCIONES IMPORTANTES
+## Restricciones Importantes
 
-### ⚠️ NO HACER
+### NO HACER
 - **NO usar Firebase Realtime Database** (usar solo Firestore)
 - **NO hardcodear datos** (usar variables de entorno)
 - **NO hacer llamadas API desde frontend** (solo desde backend)
@@ -202,7 +218,7 @@ const calcularEficiencia = (taktime, piezasMedidas, tiempoTotal) => {
 - **NO dejar logs de debug en producción**
 - **NO repetir variables innecesariamente**
 
-### ✅ SIEMPRE HACER
+### SIEMPRE HACER
 - Seguir arquitectura de capas
 - Validar datos en backend
 - Manejar errores consistentemente
@@ -212,7 +228,7 @@ const calcularEficiencia = (taktime, piezasMedidas, tiempoTotal) => {
 - Seguir principios SOLID
 - Separar responsabilidades
 
-## 🔒 SEGURIDAD
+## Seguridad
 
 ### Medidas Implementadas
 - Autenticación JWT
@@ -238,7 +254,7 @@ VITE_FIREBASE_PROJECT_ID=
 VITE_API_URL=http://localhost:3001/api
 ```
 
-## 📱 RESPONSIVE DESIGN
+## Responsive Design
 
 ### Prioridades
 1. **Mobile-first**: Diseño principal para móviles
@@ -253,7 +269,7 @@ VITE_API_URL=http://localhost:3001/api
 - `lg`: 1024px
 - `xl`: 1280px
 
-## 🧪 TESTING
+## Testing
 
 ### Casos de Prueba Críticos
 1. Detección correcta de microparos
@@ -263,7 +279,7 @@ VITE_API_URL=http://localhost:3001/api
 5. Autenticación de usuarios
 6. Responsive design
 
-## 🚀 DESPLIEGUE
+## Despliegue
 
 ### Requisitos
 - Node.js 18+
@@ -286,12 +302,29 @@ npm run dev
 npm run dev
 ```
 
+### Comandos de Calidad
+```bash
+# Linting
+npm run lint
+npm run lint:fix
+
+# Formateo
+npm run format
+npm run format:check
+
+# Type checking
+npm run type-check
+
+# Limpieza
+npm run clean
+```
+
 ### Puertos de Desarrollo
 - **Frontend**: http://localhost:5173
 - **Backend**: http://localhost:3001
 - **API Proxy**: Configurado en vite.config.ts
 
-## 🔄 FLUJO DE DESARROLLO
+## Flujo de Desarrollo
 
 ### Modificaciones Permitidas
 1. **Componentes**: Agregar/modificar componentes React
@@ -306,7 +339,7 @@ npm run dev
 3. **Base de datos**: Cambiar de Firestore
 4. **Lógica de negocio**: Alterar cálculos críticos
 
-## 📋 CHECKLIST PARA CONTRIBUIDORES
+## Checklist para Contribuidores
 
 ### Antes de Modificar
 - [ ] Entender la arquitectura de capas
@@ -328,7 +361,7 @@ npm run dev
 - [ ] Revisar seguridad
 - [ ] Eliminar logs de debug
 
-## 🤝 CONTRIBUCIÓN
+## Contribución
 
 Al editar este proyecto, mantén siempre:
 - **Escalabilidad**: Código fácil de mantener
@@ -339,7 +372,7 @@ Al editar este proyecto, mantén siempre:
 
 ---
 
-**Nota**: Este README debe ser consultado antes de realizar cualquier modificación al proyecto para asegurar que se mantengan los estándares y restricciones establecidos. 
+**Nota**: Este README debe ser consultado antes de realizar cualquier modificación al proyecto para asegurar que se mantengan los estándares y restricciones establecidos.
 
 ## Configuración de Variables de Entorno
 
@@ -390,10 +423,8 @@ La aplicación está configurada para funcionar con Vercel:
 - Configurado para puerto 3001
 - Compatible con servicios como Railway, Render, etc.
 
-### actualizaciones
-## 📝 NOTA SOBRE 'MODO DE FALLA'
+## Nota sobre 'Modo de Falla'
 
-En todas las tablas y reportes (Excel y la tabla de registros en la app) el título mostrado es 'Modo de Falla'. Sin embargo, para el manejo de datos y en el código, la variable utilizada sigue siendo 'categoriaCausa'. Este cambio es únicamente estético para mayor claridad en los reportes. 
----
-Para deploys que requieren configuración de variables de entorno, asegúrate de agregar todas las variables VITE_* y las variables del backend en la configuración del servicio de deploy. 
-main
+En todas las tablas y reportes (Excel y la tabla de registros en la app) el título mostrado es 'Modo de Falla'. Sin embargo, para el manejo de datos y en el código, la variable utilizada sigue siendo 'categoriaCausa'. Este cambio es únicamente estético para mayor claridad en los reportes.
+
+Para deploys que requieren configuración de variables de entorno, asegúrate de agregar todas las variables VITE_* y las variables del backend en la configuración del servicio de deploy.

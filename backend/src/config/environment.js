@@ -15,6 +15,11 @@ export const config = {
     clientEmail: process.env.FIREBASE_CLIENT_EMAIL
   },
   cors: {
-    origin: process.env.FRONTEND_URL || 'http://localhost:5173'
+    origin: process.env.FRONTEND_URL || [
+      'http://localhost:5173',
+      'https://metep-git-actualizaciones-axiels-projects.vercel.app',
+      'https://metep.vercel.app',
+      'https://metep-git-main-axiels-projects.vercel.app'
+    ]
   }
 };

@@ -2,7 +2,7 @@
   "name": "metep-backend",
   "version": "1.0.0",
   "type": "module",
-  "description": "Backend for METEP Industrial Microparos Analysis",
+  "description": "Backend for METEP Industrial Microparos Analysis - REST API for industrial production efficiency and micro-stops detection",
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
@@ -22,16 +22,27 @@
     "uuid": "^9.0.1"
   },
   "devDependencies": {
-    "nodemon": "^3.0.2",
-    "vite-plugin-wasm": "^3.5.0"
+    "nodemon": "^3.0.2"
   },
   "keywords": [
     "industrial",
     "microparos",
     "analysis",
     "express",
-    "firebase"
+    "firebase",
+    "api",
+    "backend",
+    "efficiency",
+    "production"
   ],
   "author": "METEP Team",
-  "license": "MIT"
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SuperAx73/METEP.git"
+  },
+  "bugs": {
+    "url": "https://github.com/SuperAx73/METEP/issues"
+  },
+  "homepage": "https://github.com/SuperAx73/METEP#readme"
 }
