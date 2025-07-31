@@ -19,7 +19,6 @@ yarn-error.log*
 !vite.config.ts
 !tailwind.config.js
 !postcss.config.js
-!eslint.config.js
 !eslint.config.mjs
 
 # Archivos informativos ignorados (excepto README.md)
