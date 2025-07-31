@@ -11,7 +11,8 @@
   ],
   "functions": {
     "api/index.js": {
-      "runtime": "@vercel/node@3.0.0"
+      "runtime": "@vercel/node@3.0.0",
+      "maxDuration": 30
     }
   },
   "build": {
@@ -20,7 +21,8 @@
     }
   },
   "env": {
-    "NODE_VERSION": "18.x"
+    "NODE_VERSION": "18.x",
+    "NODE_ENV": "production"
   },
   "headers": [
     {

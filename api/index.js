@@ -33,7 +33,12 @@ app.use(sanitizeInput);
 
 // Health check
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', timestamp: new Date().toISOString() });
+  res.json({ 
+    status: 'OK', 
+    timestamp: new Date().toISOString(),
+    environment: config.nodeEnv,
+    cors: config.cors.origin
+  });
 });
 
 // Routes
@@ -42,12 +47,25 @@ app.use('/api/studies', studyRoutes);
 // Error handling
 app.use((err, req, res, next) => {
   Logger.error('Unhandled error:', err);
-  res.status(500).json({ error: 'Error interno del servidor' });
+  
+  // Don't expose internal errors in production
+  const errorMessage = config.nodeEnv === 'production' 
+    ? 'Error interno del servidor' 
+    : err.message || 'Error interno del servidor';
+    
+  res.status(500).json({ 
+    error: errorMessage,
+    timestamp: new Date().toISOString()
+  });
 });
 
 // 404 handler
 app.use('*', (req, res) => {
-  res.status(404).json({ error: 'Ruta no encontrada' });
+  res.status(404).json({ 
+    error: 'Ruta no encontrada',
+    path: req.originalUrl,
+    timestamp: new Date().toISOString()
+  });
 });
 
 // Export for Vercel
