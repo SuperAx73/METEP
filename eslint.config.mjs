@@ -5,13 +5,18 @@ import reactRefresh from 'eslint-plugin-react-refresh';
 import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
-  { ignores: ['dist'] },
+  { ignores: ['dist', 'node_modules'] },
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
     files: ['**/*.{ts,tsx}'],
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,
+      parserOptions: {
+        ecmaFeatures: {
+          jsx: true
+        }
+      }
     },
     plugins: {
       'react-hooks': reactHooks,
@@ -23,6 +28,28 @@ export default tseslint.config(
         'warn',
         { allowConstantExport: true },
       ],
+      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+      '@typescript-eslint/no-explicit-any': 'warn',
+      'no-console': 'warn',
+      'prefer-const': 'error',
+      'no-var': 'error',
+      'semi': ['error', 'always'],
+      'quotes': ['error', 'single', { avoidEscape: true }],
+    },
+  },
+  {
+    files: ['**/*.{js,mjs}'],
+    languageOptions: {
+      ecmaVersion: 2020,
+      globals: globals.node,
+    },
+    rules: {
+      'no-console': 'off',
+      'no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+      'prefer-const': 'error',
+      'no-var': 'error',
+      'semi': ['error', 'always'],
+      'quotes': ['error', 'single', { avoidEscape: true }],
     },
   }
 );
