@@ -22,8 +22,8 @@ const Header: React.FC = () => {
           <div className="flex items-center space-x-2 sm:space-x-3">
             <Factory className="h-6 w-6 sm:h-8 sm:w-8 text-blue-400" />
             <div>
-              <h1 className="text-lg sm:text-xl font-bold">METEP</h1>
-              <p className="text-xs sm:text-sm text-slate-300 hidden sm:block">Análisis de Microparos</p>
+              <h1 className="text-lg sm:text-xl font-bold">MTEP</h1>
+              <p className="text-xs sm:text-sm text-slate-300 hidden sm:block">Medición de Tiempos y Eficiencia de Producción</p>
             </div>
           </div>
           

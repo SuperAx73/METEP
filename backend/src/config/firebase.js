@@ -37,7 +37,7 @@ if (!config.firebase.projectId || !config.firebase.privateKey || !config.firebas
     projectId: config.firebase.projectId,
     privateKey: process.env.FIREBASE_PRIVATE_KEY?.startsWith('"')
       ? JSON.parse(process.env.FIREBASE_PRIVATE_KEY)
-      : config.firebase.privateKey?.replace(/\\n/g, '\n'),
+      : config.firebase.privateKey?.replace(/\\n/gm, "\n")
     clientEmail: config.firebase.clientEmail
   };
 
