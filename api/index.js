@@ -14,6 +14,9 @@ import { sanitizeInput } from '../backend/src/middleware/validation.js';
 
 const app = express();
 
+// Trust proxy for Vercel (fixes rate limiter warning)
+app.set('trust proxy', 1);
+
 // Security middleware
 app.use(helmet());
 app.use(cors({
@@ -36,27 +39,7 @@ app.get('/api/health', (req, res) => {
   res.json({ 
     status: 'OK', 
     timestamp: new Date().toISOString(),
-    environment: config.nodeEnv,
-    cors: config.cors.origin
-  });
-});
-
-// Debug endpoint (remove in production)
-app.get('/api/debug', (req, res) => {
-  res.json({ 
-    status: 'Debug info',
-    timestamp: new Date().toISOString(),
-    environment: config.nodeEnv,
-    firebase: {
-      projectId: config.firebase.projectId ? 'Set' : 'Missing',
-      privateKey: config.firebase.privateKey ? 'Present' : 'Missing',
-      clientEmail: config.firebase.clientEmail ? 'Present' : 'Missing'
-    },
-    env: {
-      FIREBASE_PROJECT_ID: process.env.FIREBASE_PROJECT_ID ? 'Set' : 'Missing',
-      FIREBASE_PRIVATE_KEY: process.env.FIREBASE_PRIVATE_KEY ? 'Present' : 'Missing',
-      FIREBASE_CLIENT_EMAIL: process.env.FIREBASE_CLIENT_EMAIL ? 'Present' : 'Missing'
-    }
+    environment: config.nodeEnv
   });
 });
 
